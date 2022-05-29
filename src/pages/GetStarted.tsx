@@ -1,7 +1,11 @@
 import { Box, Button, Typography } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import Title from "../components/Title";
+import { useNavigate } from "react-router-dom";
 
-function App() {
+function GetStarted() {
+
+  let navigate = useNavigate()
   return (
     <div className="App">
       <Box
@@ -12,47 +16,7 @@ function App() {
           my: "15%",
         }}
       >
-        <Typography
-          sx={{
-            fontFamily: "Raleway",
-            fontWeight: "bold",
-            color: "white",
-            fontSize: ["2rem", "3rem", "4rem"],
-          }}
-        >
-          Sab Sunno.
-        </Typography>
-        <Typography
-          sx={{
-            fontFamily: "Raleway",
-            fontWeight: "bold",
-            color: "white",
-            fontSize: "1rem",
-          }}
-          display="inline"
-        >
-          #Connecting
-          <Typography
-            display="inline"
-            sx={{
-              color: "#07F0FF",
-              fontWeight: "bold",
-            }}
-          >
-            People
-          </Typography>
-          Through
-          <Typography
-            display="inline"
-            sx={{
-              color: "#07F0FF",
-              fontWeight: "bold",
-            }}
-          >
-            Thoughts
-          </Typography>
-        </Typography>
-
+        <Title/>
         <Button
           variant="contained"
           disableElevation
@@ -65,6 +29,7 @@ function App() {
               backgroundColor: "rgba(248, 248, 248, 0.8)",
             },
           }}
+          onClick={()=> navigate('/login')}
         >
           <Typography
             sx={{
@@ -87,4 +52,4 @@ function App() {
   );
 }
 
-export default App;
+export default GetStarted;
