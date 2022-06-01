@@ -19,24 +19,11 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   path,
 }) => {
   const navigate = useNavigate();
-  const userData = localStorage.getItem("user");
-  const user = JSON.parse(userData as string);
 
-  const handleRedirect = async() => {
-    // await fetch(`http://localhost:8000/room/${roomId}/${user._id}`, {
-    //   method: "GET",
-   
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data)
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
-        navigate(`/room/${roomId}`)
-  }
-  
+  const handleRedirect = async () => {
+    navigate(`/room/${roomId}`);
+  };
+
   return (
     <Box
       sx={{
