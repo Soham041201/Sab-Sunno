@@ -1,11 +1,8 @@
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import {
-  Box,
-  Button,
-  Container, TextField,
-  Typography
-} from "@mui/material";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import Cookies from "js-cookie";
 import { FunctionComponent, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 import GoogleSignIn from "../functions/authProviders/googleSign";
@@ -13,6 +10,8 @@ import { LoginWithEmail } from "../functions/authProviders/login";
 import RegisterUsingEmailAndPassword from "../functions/authProviders/register";
 import UploadImage from "../functions/dataBase/uploadImage";
 import GoogleIcon from "../images/google.svg";
+import { setNotification } from "../redux/slice/notificationSlice";
+import { setUser } from "../redux/slice/userSlice";
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string | undefined>();
@@ -23,13 +22,63 @@ const Login: FunctionComponent = () => {
   const [url, setUrl] = useState<string | undefined>();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState<boolean>(false);
+
+  const handleGoogleSignIn = () => {
+    GoogleSignIn(async (data) => {
+      const userData: any = {
+        email: data.email,
+        firstName: data.displayName,
+        lastName: "test",
+        password: "test",
+        photoURL: data.photoURL,
+        username: data.displayName,
+      };
+      await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          dispatch(setUser({ user: data.user }));
+          dispatch(
+            setNotification({
+              message: "Logged in Successfully",
+              type: "success",
+            })
+          );
+          navigate("/home");
+          localStorage.clear();
+          localStorage.setItem("user", JSON.stringify(data.user));
+          Cookies.remove("user-token");
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 1 * 7);
+          Cookies.set("user-token", data.user._id, {
+            expires: expiresAt,
+          });
+        })
+        .catch((error) => {
+          dispatch(
+            setNotification({
+              message: "Oh no! Something went wrong. Please try again",
+              type: "error",
+            })
+          );
+          console.error("Error:", error);
+        });
+    });
+  };
 
   const handleLogin = async () => {
     if (email && password) {
       LoginWithEmail(email, password, async (user) => {
         console.log(user);
-        await fetch("http://localhost:8000/getUser", {
+        await fetch("http://localhost:8000/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -40,15 +89,34 @@ const Login: FunctionComponent = () => {
         })
           .then((response) => response.json())
           .then((data) => {
-            localStorage.setItem("user", JSON.stringify(data));
             console.log(data);
+            dispatch(setUser(data));
+            dispatch(
+              setNotification({
+                message: "Logged in Successfully",
+                type: "success",
+              })
+            );
+            navigate("/home");
+            localStorage.clear();
+            localStorage.setItem("user", JSON.stringify(data.user));
+            Cookies.remove("user-token");
+
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 1 * 7);
+            Cookies.set("user-token", data.user._id, {
+              expires: expiresAt,
+            });
           })
           .catch((error) => {
+            dispatch(
+              setNotification({
+                message: "Oh no! Something went wrong. Please try again",
+                type: "error",
+              })
+            );
             console.error("Error:", error);
           });
-        if (user) {
-          navigate("/home");
-        }
       });
     }
   };
@@ -73,14 +141,35 @@ const Login: FunctionComponent = () => {
           body: JSON.stringify(userData),
         })
           .then((response) => response.json())
-          .then((data) => {
-            console.log("Success:", data);
+          .then((data: any) => {
+            console.log(data.user);
+            dispatch(setUser(data.user));
+            dispatch(
+              setNotification({
+                message: "You have been Registered Successfully",
+                type: "success",
+              })
+            );
+
+            navigate("/home");
+            localStorage.clear();
+            localStorage.setItem("user", JSON.stringify(data.user));
+            Cookies.remove("user-token");
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 1 * 7);
+            Cookies.set("user-token", data.user._id, {
+              expires: expiresAt,
+            });
           })
           .catch((error) => {
             console.error("Error:", error);
+            dispatch(
+              setNotification({
+                message: "Oh no! Something went wrong. Please try again",
+                type: "error",
+              })
+            );
           });
-        localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/home");
       });
     }
   };
@@ -281,22 +370,22 @@ const Login: FunctionComponent = () => {
           />
         </Button>
         <Typography
-            sx={{
-              color: "black",
-              textTransform: "none",
-              fontFamily: "Raleway",
-              mx:'auto',
-              my:1
-            }}
-          >
-        or
-          </Typography>
+          sx={{
+            color: "black",
+            textTransform: "none",
+            fontFamily: "Raleway",
+            mx: "auto",
+            my: 1,
+          }}
+        >
+          or
+        </Typography>
         <Button
           variant="contained"
           disableElevation
           sx={{
             backgroundColor: "white",
-          
+
             mx: "auto",
             width: 230,
             borderRadius: "60px",
@@ -304,39 +393,8 @@ const Login: FunctionComponent = () => {
               backgroundColor: "rgba(248, 248, 248, 0.8)",
             },
           }}
-          startIcon={
-            <img src={GoogleIcon} alt="google-icon" width={24} />
-          }
-          onClick={() => {
-            GoogleSignIn(async (data) => {
-              const userData = {
-                email: data.email,
-                firstName: data.displayName,
-                lastName: "",
-                password: "",
-                photoURL: data.photoURL,
-                username: data.displayName,
-              };
-              const userInfo = JSON.stringify(userData)
-              await fetch("http://localhost:8000/register", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  localStorage.setItem("isAuth", "true");
-                  localStorage.setItem("user", userInfo);
-                  navigate("/home");
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                });
-         
-            });
-          }}
+          startIcon={<img src={GoogleIcon} alt="google-icon" width={24} />}
+          onClick={handleGoogleSignIn}
         >
           <Typography
             sx={{

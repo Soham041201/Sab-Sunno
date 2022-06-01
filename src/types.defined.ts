@@ -6,7 +6,6 @@ type User = {
     password: string;
     photoURL: string;
     username: string;
-
 }
 
 

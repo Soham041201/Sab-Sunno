@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import socketInit from "../socket";
+import User from "../types.defined";
 import { useStateWithCallback } from "./useStateWithCallback";
 
-export const useWebRTC = (roomId: any, user: any) => {
+export const useWebRTC = (roomId: any, user: User) => {
   const [clients, setClients] = useStateWithCallback([]);
   const audioElement = useRef<any>({});
   const connections = useRef<any>({});
@@ -11,12 +12,16 @@ export const useWebRTC = (roomId: any, user: any) => {
   const clientsRef = useRef(null);
 
   const addNewUser = useCallback(
-    (newUser: any, cb: any) => {
-      const lookingForUser = clients.find(
-        (user: any) => user._id === newUser._id
+    (newClient: User, cb: FunctionStringCallback) => {
+      const lookingFor = clients.find(
+        (client: User) => client._id === newClient._id
       );
-      if (lookingForUser === undefined) {
-        setClients((clients: any) => [...clients, newUser], cb);
+
+      if (lookingFor === undefined) {
+        setClients(
+          (existingClients: User[]) => [...existingClients, newClient],
+          cb
+        );
       }
     },
     [clients, setClients]
@@ -98,6 +103,7 @@ export const useWebRTC = (roomId: any, user: any) => {
           });
         }
       };
+
       connections.current[peerId].ontrack = ({
         streams: [remoteStream],
       }: any) => {
@@ -114,12 +120,12 @@ export const useWebRTC = (roomId: any, user: any) => {
               if (settled) {
                 clearInterval(interval);
               }
-            }, 300);
+            }, 100);
           }
         });
       };
 
-      await localMediaStream.current.getTracks().forEach((track: any) => {
+      await localMediaStream.current.getTracks().forEach((track: AudioBuffer) => {
         connections.current[peerId].addTrack(track, localMediaStream.current);
       });
       if (createOffer) {
@@ -138,14 +144,20 @@ export const useWebRTC = (roomId: any, user: any) => {
       }
     };
 
-    const handleRemovePeer = async ({ peerId, userId }: any) => {
+    const handleRemovePeer = async ({
+      peerId,
+      userId,
+    }: {
+      peerId: string;
+      userId: string;
+    }) => {
       if (connections.current[peerId]) {
         connections.current[peerId].close();
       }
       delete connections.current[peerId];
       delete audioElement.current[peerId];
-      setClients((list: any[]) =>
-        list.filter((client: { id: any }) => client.id !== userId)
+      setClients((list: User[]) =>
+        list.filter((client: { _id: String }) => client._id !== userId)
       );
     };
 
@@ -158,6 +170,12 @@ export const useWebRTC = (roomId: any, user: any) => {
       localMediaStream.current?.getTracks().forEach((track: any) => {
         track.stop();
       });
+
+      for (let peerId in connections.current) {
+        connections.current[peerId].close();
+        delete connections?.current[peerId];
+        delete audioElement?.current[peerId];
+      }
       socket.current.emit("leave", { roomId, user });
       socket.current.off("session-description");
       socket.current.off("add-peer");

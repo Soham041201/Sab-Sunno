@@ -2,6 +2,7 @@ import { ThemeProvider } from "@mui/material";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Menubar from "../components/Menubar";
+import Notification from "../components/Notification";
 import { store } from "../redux/store";
 import theme from "../style/theme";
 import GetStarted from "./GetStarted";
@@ -14,6 +15,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Provider store={store}>
         <Menubar />
+        <Notification/>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<GetStarted />} />

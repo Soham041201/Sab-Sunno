@@ -8,51 +8,79 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-
 import RoomBox from "../components/RoomBox";
+import { setNotification } from "../redux/slice/notificationSlice";
 
 const Home: FunctionComponent = () => {
-  const uuid = uuidv4();
-  const roomId = uuid as unknown as string;
   const [isNewRoom, setIsNewRoom] = useState(false);
 
-  let user = localStorage.getItem("user")
-  if(user){
-    user = JSON.parse(user.trim());
-  }
+  // const user = useSelector((state: any) => state.user.user);
+  const userData = localStorage.getItem("user");
+  const user = JSON.parse(userData as string);
+  const dispatch = useDispatch();
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
   const navigate = useNavigate();
 
-  const [Rooms, setRooms] = useState<any>([]);
-
+  const [rooms, setRooms] = useState<any>([]);
   useEffect(() => {
-    fetch("http://localhost:8000/getRooms", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    fetch("http://localhost:8000/rooms", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.rooms);
+        setRooms(data.rooms);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data) {
-            console.log(data.rooms);
-            setRooms(data.rooms)
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-  },[])
-  
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const handleClose = () => {
     setIsNewRoom(false);
+  };
+
+  const createNewRoom = async () => {
+    const roomData = {
+      roomName: roomName,
+      roomDescription: roomDescription,
+      users: [user],
+      createdBy: user,
+    };
+    await fetch("http://localhost:8000/room", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(roomData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          dispatch(
+            setNotification({
+              message: "Room Created Successfully",
+              type: "success",
+            })
+          );
+          navigate(`/room/${data.room._id}`);
+        }
+      })
+      .catch((error) => {
+        dispatch(
+          setNotification({
+            message: "Oh no! Something went wrong. Please try again",
+            type: "error",
+          })
+        );
+        console.error("Error:", error);
+      });
   };
 
   return (
@@ -175,31 +203,7 @@ const Home: FunctionComponent = () => {
                   backgroundColor: "rgba(248, 248, 248, 0.8)",
                 },
               }}
-              onClick={async () => {
-                const roomData = {
-                  id: roomId,
-                  roomName: roomName,
-                  roomDescription: roomDescription,
-                  users: [user],
-                  createdBy: user,
-                };
-                await fetch("http://localhost:8000/createRoom", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(roomData),
-                })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    if (data) {
-                      navigate(`/room/${roomId}`);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Error:", error);
-                  });
-              }}
+              onClick={createNewRoom}
             >
               <Typography
                 sx={{
@@ -220,18 +224,19 @@ const Home: FunctionComponent = () => {
         </Dialog>
       </div>
 
-      {Rooms?.map((room : any) => {
-        return (
-          <RoomBox
-            key={Rooms.indexOf(room)}
-            roomId={roomId}
-            roomName={room.roomName}
-            roomDescription={room.roomDescription}
-            users={room.users}
-            onClick={(roomId) => navigate(`/room/${roomId}`)}
-          />
-        );
-      })}
+      {rooms &&
+        rooms?.map((room: any) => {
+          return (
+            <RoomBox
+              key={rooms.indexOf(room)}
+              roomId={room._id}
+              roomName={room.roomName}
+              roomDescription={room.roomDescription}
+              users={room.users}
+              path={room._id}
+            />
+          );
+        })}
     </Container>
   );
 };

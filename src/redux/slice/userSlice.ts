@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import User from "../../types.defined";
+import { RootState } from "../store";
 
 interface userState {
-  user: User;
+  user : User ;
 }
 
 const initialState: userState = {
@@ -18,7 +19,7 @@ const initialState: userState = {
 };
 
 export const usersSlice = createSlice({
-  name: "userData",
+  name: "user",
   initialState,
   reducers: {
     setUser: (state: { user: User }, action: { payload: { user: User } }) => {
@@ -30,4 +31,6 @@ export const usersSlice = createSlice({
 
 export const { setUser } = usersSlice.actions;
 
+export const userPictureSelector = (state: RootState) => state.user.user.photoURL;
+export const userNameSelector = (state: RootState) => state.user.user.firstName;
 export default usersSlice.reducer;

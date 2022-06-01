@@ -8,7 +8,6 @@ const GoogleSignIn = async (callback : (user: any)=>void) => {
   await signInWithPopup(auth, provider)
     .then((result) => {
       const user = result.user;
-    
       callback(user)
     })
     .catch((error) => {

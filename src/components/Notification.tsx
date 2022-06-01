@@ -1,8 +1,11 @@
-import { Alert, Slide, Snackbar } from '@mui/material';
-import * as React from 'react';
-import { FunctionComponent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { closeNotification, notificationSelector } from '../redux/slice/notificationSlice';
+import { Alert, Slide, Snackbar } from "@mui/material";
+import * as React from "react";
+import { FunctionComponent } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  closeNotification,
+  notificationSelector,
+} from "../redux/slice/notificationSlice";
 
 const Notification: FunctionComponent = () => {
   const dispatch = useDispatch();
@@ -11,11 +14,11 @@ const Notification: FunctionComponent = () => {
 
   return (
     <Snackbar
-      anchorOrigin={{ horizontal: 'center', vertical: 'top' }}
+      anchorOrigin={{ horizontal: "center", vertical: "top" }}
       open={open}
       onClose={() => dispatch(closeNotification())}
       TransitionComponent={Slide}
-      autoHideDuration={5000}
+      autoHideDuration={1000}
     >
       <Alert severity={type}>{message}</Alert>
     </Snackbar>
