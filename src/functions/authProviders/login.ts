@@ -4,7 +4,7 @@ import { app } from "../../firebase/firebase";
 export const auth = getAuth(app);
 
 const LoginWithEmail = async (
-  email: string ,
+  email: string,
   password: string,
   callback: (user: any) => any
 ) => {
@@ -18,10 +18,10 @@ const LoginWithEmail = async (
     });
 };
 
-const Logout = async () => {
+const Logout = async (callback: (user: any) => any) => {
   await signOut(auth)
-    .then(() => {
-      localStorage.clear();
+    .then((data) => {
+      callback(data);
     })
     .catch((error) => {
       console.log(error);

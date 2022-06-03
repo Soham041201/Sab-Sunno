@@ -1,14 +1,13 @@
-import { Avatar, AvatarGroup, Box, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Badge, Box, Typography } from "@mui/material";
+import { deepOrange } from "@mui/material/colors";
 import { FunctionComponent } from "react";
 import { useNavigate } from "react-router-dom";
 import User from "../types.defined";
-
 interface RoomBoxProps {
   roomId: string;
   roomName: string;
   roomDescription: string;
   users: User[];
-  path: string;
 }
 
 const RoomBox: FunctionComponent<RoomBoxProps> = ({
@@ -16,7 +15,6 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   roomId,
   roomName,
   users,
-  path,
 }) => {
   const navigate = useNavigate();
 
@@ -40,18 +38,24 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
     >
       <Typography variant={"h2"}>{roomName}</Typography>
       <Typography variant={"h3"}>{roomDescription}</Typography>
-      <AvatarGroup
-        max={4}
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          mt: 1,
-        }}
-      >
-        {users.map((user) => {
-          return <Avatar key={user._id} src={user.photoURL} />;
-        })}
-      </AvatarGroup>
+      {users && (
+        <AvatarGroup
+          max={4}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            mt: 1,
+          }}
+        >
+          {users.map((user) => {
+            if (user !== null) {
+              return (
+                <Avatar key={user._id} src={user?.photoURL && user?.photoURL} />
+              );
+            }
+          })}
+        </AvatarGroup>
+      )}
     </Box>
   );
 };

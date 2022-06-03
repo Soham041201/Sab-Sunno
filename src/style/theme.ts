@@ -37,6 +37,12 @@ const baseThemeOptions: ThemeOptions = {
       fontWeight: 'bold',
       fontFamily: 'Raleway',
       color: "white",
+  },
+  body1:{
+    fontSize: 14,
+    fontWeight: 'bold',
+    fontFamily: 'Raleway',
+    color: "white",
   }
   },
 };

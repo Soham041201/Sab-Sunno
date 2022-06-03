@@ -53,8 +53,6 @@ const Login: FunctionComponent = () => {
             })
           );
           navigate("/home");
-          localStorage.clear();
-          localStorage.setItem("user", JSON.stringify(data.user));
           Cookies.remove("user-token");
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + 1 * 7);
@@ -98,8 +96,6 @@ const Login: FunctionComponent = () => {
               })
             );
             navigate("/home");
-            localStorage.clear();
-            localStorage.setItem("user", JSON.stringify(data.user));
             Cookies.remove("user-token");
 
             const expiresAt = new Date();
@@ -152,8 +148,6 @@ const Login: FunctionComponent = () => {
             );
 
             navigate("/home");
-            localStorage.clear();
-            localStorage.setItem("user", JSON.stringify(data.user));
             Cookies.remove("user-token");
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 1 * 7);

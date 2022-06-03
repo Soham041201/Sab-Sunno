@@ -8,20 +8,19 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import RoomBox from "../components/RoomBox";
 import { setNotification } from "../redux/slice/notificationSlice";
+import { selectUser } from "../redux/slice/userSlice";
 
 const Home: FunctionComponent = () => {
   const [isNewRoom, setIsNewRoom] = useState(false);
 
-  // const user = useSelector((state: any) => state.user.user);
-  const userData = localStorage.getItem("user");
-  const user = JSON.parse(userData as string);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
@@ -233,7 +232,6 @@ const Home: FunctionComponent = () => {
               roomName={room.roomName}
               roomDescription={room.roomDescription}
               users={room.users}
-              path={room._id}
             />
           );
         })}

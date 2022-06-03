@@ -2,7 +2,6 @@ import { io } from "socket.io-client"
 
 
 const socketInit = () => {
-
     const options : any  = {
         transports: ['websocket'],
         'force new connection': true,
@@ -14,3 +13,4 @@ const socketInit = () => {
 
 
 export default socketInit 
+

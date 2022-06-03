@@ -1,13 +1,14 @@
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import {app} from "../../firebase/firebase";
+import { app } from "../../firebase/firebase";
 
-const RegisterUsingEmailAndPassword = async (email : string , password : string, callback : (data: any)=> any) => {
+const RegisterUsingEmailAndPassword = async (
+  email: string,
+  password: string,
+  callback: (data: any) => any
+) => {
   const auth = getAuth(app);
-  await createUserWithEmailAndPassword(auth,email, password)
+  await createUserWithEmailAndPassword(auth, email, password)
     .then((user) => {
-      localStorage.setItem("isAuth", "true");
-      const data = JSON.stringify(user);
-      localStorage.setItem("user", data);
       callback(user);
     })
     .catch((error) => {
