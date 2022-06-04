@@ -1,4 +1,4 @@
-import { AppBar, Box, TextField, Typography } from "@mui/material";
+import { AppBar, Box, Typography } from "@mui/material";
 import Cookies from "js-cookie";
 import { FunctionComponent, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +12,7 @@ const Menubar: FunctionComponent = () => {
   const isMobile = window.innerWidth < 600;
   useEffect(() => {
     if (token) {
-      fetch(`http://localhost:8000/user/${token}`, {
+      fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -51,16 +51,6 @@ const Menubar: FunctionComponent = () => {
           display: "flex",
         }}
       >
-        {/* <TextField
-          size="small"
-          variant="outlined"
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            mx: 1,
-            width: "200px",
-          }}
-          label={<Typography variant={"h3"}>Search</Typography>}
-        /> */}
         <MenuTab src={photoURL} />
       </Box>
     </AppBar>

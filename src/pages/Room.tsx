@@ -27,7 +27,7 @@ const Room: FunctionComponent = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/room/${roomId}`, {
+    fetch(`https://sab-sunno-backend.herokuapp.com/room/${roomId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,4 @@
-import { Avatar, AvatarGroup, Badge, Box, Typography } from "@mui/material";
-import { deepOrange } from "@mui/material/colors";
+import { Avatar, AvatarGroup, Box, Typography } from "@mui/material";
 import { FunctionComponent } from "react";
 import { useNavigate } from "react-router-dom";
 import User from "../types.defined";
@@ -53,6 +52,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
                 <Avatar key={user._id} src={user?.photoURL && user?.photoURL} />
               );
             }
+            return <div></div>;
           })}
         </AvatarGroup>
       )}
