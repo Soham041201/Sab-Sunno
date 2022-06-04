@@ -83,11 +83,14 @@ const Home: FunctionComponent = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{
+      my:2
+    }}>
       <Typography
         variant={"h1"}
         sx={{
           width: "10%",
+          mx: "2%",
         }}
       >
         Trending Topics
@@ -98,8 +101,8 @@ const Home: FunctionComponent = () => {
         sx={{
           backgroundColor: "white",
           my: 2,
-          mx: "auto",
           width: 200,
+          mx: "2%",
           borderRadius: "60px",
           "&:hover": {
             backgroundColor: "rgba(248, 248, 248, 0.8)",

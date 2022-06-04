@@ -1,4 +1,4 @@
-type User = {
+export type User = {
   _id: string;
   firstName: string;
   lastName: string;
@@ -14,4 +14,7 @@ type RoomAdd = {
 
 export type RoomUser = User & RoomAdd;
 
-export default User;
+export enum Theme {
+  light = "light",
+  dark = "dark",
+}

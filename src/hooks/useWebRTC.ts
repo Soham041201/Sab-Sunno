@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useRef } from "react";
 import socketInit from "../socket";
-import User, { RoomUser } from "../types.defined";
+import  { User, RoomUser } from "../types.defined";
 import { useStateWithCallback } from "./useStateWithCallback";
 
 export const useWebRTC = (roomId: any, user: User) => {

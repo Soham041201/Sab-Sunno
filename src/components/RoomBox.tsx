@@ -1,7 +1,7 @@
 import { Avatar, AvatarGroup, Box, Typography } from "@mui/material";
 import { FunctionComponent } from "react";
 import { useNavigate } from "react-router-dom";
-import User from "../types.defined";
+import { User } from "../types.defined";
 interface RoomBoxProps {
   roomId: string;
   roomName: string;
@@ -52,7 +52,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
                 <Avatar key={user._id} src={user?.photoURL && user?.photoURL} />
               );
             }
-            return <div></div>;
+            return <Typography>Be the first one to join this room!</Typography>;
           })}
         </AvatarGroup>
       )}

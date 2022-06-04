@@ -53,7 +53,7 @@ const Room: FunctionComponent = () => {
   }, [isMuted]);
 
   return (
-    <div>
+    <Container>
       <Button
         startIcon={
           <ArrowBackIcon
@@ -87,11 +87,9 @@ const Room: FunctionComponent = () => {
           justifyContent: "center",
         }}
       >
-        <Box
-          sx={{
-            mb: 1,
-          }}
-        >
+        <Box sx={{
+          my:1
+        }}>
           <Typography variant={"h1"}>{room.roomName}</Typography>
           <Typography variant={"h3"}>{room.roomDescription}</Typography>
         </Box>
@@ -182,7 +180,7 @@ const Room: FunctionComponent = () => {
             bottom: 0,
             position: "center",
             mx: "auto",
-            my: 2,
+            mt: 2,
           }}
         >
           <IconButton
@@ -208,7 +206,7 @@ const Room: FunctionComponent = () => {
           </IconButton>
         </Box>
       </Container>
-    </div>
+    </Container>
   );
 };
 

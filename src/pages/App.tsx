@@ -3,18 +3,21 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Menubar from "../components/Menubar";
 import Notification from "../components/Notification";
 import ProtectedRoute from "../components/ProtectedRoute";
-import { CssBaseline } from '@mui/material/';
-import theme from "../style/theme";
+import { CssBaseline } from "@mui/material/";
+import { lightTheme, darkTheme } from "../style/theme";
 import GetStarted from "./GetStarted";
 import Home from "./Home";
 import Login from "./Login";
 import NotFound from "./NotFound";
 import Room from "./Room";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 function App() {
+  const theme = useSelector((state: RootState) => state.theme.theme);
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline/>
+    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+      <CssBaseline />
       <Menubar />
       <Notification />
       <BrowserRouter>
@@ -37,7 +40,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<NotFound/>}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
