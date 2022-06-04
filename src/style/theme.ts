@@ -18,6 +18,9 @@ const baseThemeOptions: ThemeOptions = {
     primary: {
       main: sunoColor,
     },
+    background:{
+      default: sunoColor,
+    }
   },
   typography: {
     h1: {

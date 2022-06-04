@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Menubar from "../components/Menubar";
 import Notification from "../components/Notification";
 import ProtectedRoute from "../components/ProtectedRoute";
+import { CssBaseline } from '@mui/material/';
 import theme from "../style/theme";
 import GetStarted from "./GetStarted";
 import Home from "./Home";
@@ -13,6 +14,7 @@ import Room from "./Room";
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline/>
       <Menubar />
       <Notification />
       <BrowserRouter>

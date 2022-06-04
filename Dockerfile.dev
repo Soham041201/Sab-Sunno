@@ -1,0 +1,6 @@
+FROM node:17
+WORKDIR /sab-sunno
+COPY package*.json ./
+RUN yarn
+COPY . ./
+CMD ["yarn", "start"]

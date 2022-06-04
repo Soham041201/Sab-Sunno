@@ -3,13 +3,13 @@ import Cookies from "js-cookie";
 import { FunctionComponent, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, userPictureSelector } from "../redux/slice/userSlice";
-import { RootState } from "../redux/store";
 import MenuTab from "./MenuTab";
 
 const Menubar: FunctionComponent = () => {
   const photoURL = useSelector(userPictureSelector);
   const dispatch = useDispatch();
   const token = Cookies.get("user-token");
+  const isMobile = window.innerWidth < 600;
   useEffect(() => {
     if (token) {
       fetch(`http://localhost:8000/user/${token}`, {
@@ -29,6 +29,7 @@ const Menubar: FunctionComponent = () => {
           console.error("Error:", error);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -43,14 +44,14 @@ const Menubar: FunctionComponent = () => {
       }}
       position="static"
     >
-      <Typography variant={"h2"}>Sab Sunno.</Typography>
+      <Typography variant={"h2"}>{isMobile ? `Ss.` : `Sab Sunno.`}</Typography>
 
       <Box
         sx={{
           display: "flex",
         }}
       >
-        <TextField
+        {/* <TextField
           size="small"
           variant="outlined"
           sx={{
@@ -59,7 +60,7 @@ const Menubar: FunctionComponent = () => {
             width: "200px",
           }}
           label={<Typography variant={"h3"}>Search</Typography>}
-        />
+        /> */}
         <MenuTab src={photoURL} />
       </Box>
     </AppBar>

@@ -1,9 +1,11 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import {
   Avatar,
   Badge,
   Box,
+  Button,
   Container,
   Grid,
   IconButton,
@@ -11,22 +13,18 @@ import {
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useWebRTC } from "../hooks/useWebRTC";
 import muteIcon from "../images/mute.png";
-import { RootState } from "../redux/store";
+import { selectUser } from "../redux/slice/userSlice";
 import { RoomUser } from "../types.defined";
-
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelector(selectUser);
   const [room, setRoom] = useState<any>({});
   const { clients, provideRef, handleMute } = useWebRTC(roomId, user);
   const [isMuted, setIsMuted] = useState<boolean>(true);
-
-  useEffect(() => {
-    handleMute(user._id, isMuted, roomId);
-  }, [isMuted]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`http://localhost:8000/room/${roomId}`, {
@@ -49,8 +47,39 @@ const Room: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    handleMute(user._id, isMuted, roomId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMuted]);
+
   return (
     <div>
+      <Button
+        startIcon={
+          <ArrowBackIcon
+            sx={{
+              color: "white",
+            }}
+          />
+        }
+        sx={{
+          mx: 5,
+        }}
+        onClick={() => navigate("/home")}
+      >
+        <Typography
+          variant={"h3"}
+          sx={{
+            textTransform: "none",
+            textDecoration: "underline",
+            textUnderlineOffset: 4,
+            textDecorationColor: "#b388ff",
+            textDecorationThickness: "2px",
+          }}
+        >
+          back to rooms
+        </Typography>
+      </Button>
       <Container
         sx={{
           display: "flex",
@@ -60,7 +89,7 @@ const Room: FunctionComponent = () => {
       >
         <Box
           sx={{
-            my: 1,
+            mb: 1,
           }}
         >
           <Typography variant={"h1"}>{room.roomName}</Typography>
@@ -92,6 +121,9 @@ const Room: FunctionComponent = () => {
                     <Box
                       sx={{
                         p: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
                       <audio
@@ -109,8 +141,8 @@ const Room: FunctionComponent = () => {
                         badgeContent={
                           <Avatar
                             sx={{
-                              width: 28,
-                              height: 28,
+                              width: 24,
+                              height: 24,
                               backgroundColor: "transparent",
                             }}
                             src={muteIcon}
@@ -124,9 +156,21 @@ const Room: FunctionComponent = () => {
                           sx={{ width: 48, height: 48 }}
                         />
                       </Badge>
-                      <Typography variant={"body1"} sx={{ my: 1 }}>
+
+                      <Typography variant={"body1"} sx={{ mt: 1 }}>
                         {client.firstName}
                       </Typography>
+                      {room?.createdBy?._id === client?._id && (
+                        <Box
+                          sx={{
+                            backgroundColor: "#b388ff",
+                            width: "40px",
+                            borderRadius: "20px",
+                          }}
+                        >
+                          <Typography textAlign={"center"}>host</Typography>
+                        </Box>
+                      )}
                     </Box>
                   </Grid>
                 );
