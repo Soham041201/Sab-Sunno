@@ -97,7 +97,7 @@ const darkThemeOptions: ThemeOptions = {
     color: "white",
   }
   },
-};
+};  
 
 const lightTheme = responsiveFontSizes(createTheme(lightThemeOptions));
 const darkTheme = responsiveFontSizes(createTheme(darkThemeOptions));

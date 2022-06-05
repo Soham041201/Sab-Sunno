@@ -7,6 +7,7 @@ interface RoomBoxProps {
   roomName: string;
   roomDescription: string;
   users: User[];
+  createdBy: User;
 }
 
 const RoomBox: FunctionComponent<RoomBoxProps> = ({
@@ -14,9 +15,10 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   roomId,
   roomName,
   users,
+  createdBy,
 }) => {
   const navigate = useNavigate();
-
+  // const [isCreator, setIsCreator] = useState(false);
   const handleRedirect = async () => {
     navigate(`/room/${roomId}`);
   };
@@ -35,9 +37,23 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
       }}
       onClick={handleRedirect}
     >
-      <Typography variant={"h2"}>{roomName}</Typography>
-      <Typography variant={"h3"}>{roomDescription}</Typography>
-      {users && (
+      <Box
+        display="flex"
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box>
+          <Typography variant={"h2"}>{roomName}</Typography>
+          <Typography variant={"h3"}>{roomDescription}</Typography>
+        </Box>
+        <Box display="flex">
+          <Avatar src={createdBy.photoURL} />
+        </Box>
+      </Box>
+      
+      {users.length > 0 ? (
         <AvatarGroup
           max={4}
           sx={{
@@ -52,9 +68,20 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
                 <Avatar key={user._id} src={user?.photoURL && user?.photoURL} />
               );
             }
-            return <Typography>Be the first one to join this room!</Typography>;
+            return null;
           })}
         </AvatarGroup>
+      ) : (
+        <Typography
+          sx={{
+            mt: 2,
+            textAlign: "center",
+            color: "#b388ff",
+          }}
+          variant={"body1"}
+        >
+          Be the first one to join this room!
+        </Typography>
       )}
     </Box>
   );

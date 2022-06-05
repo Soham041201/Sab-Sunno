@@ -2,10 +2,11 @@ import NightlightIcon from "@mui/icons-material/Nightlight";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import { AppBar, Box, IconButton, Typography } from "@mui/material";
 import Cookies from "js-cookie";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../redux/slice/themeSlice";
 import { setUser, userPictureSelector } from "../redux/slice/userSlice";
+import { RootState } from "../redux/store";
 import { Theme } from "../types.defined";
 import MenuTab from "./MenuTab";
 const Menubar: FunctionComponent = () => {
@@ -13,7 +14,8 @@ const Menubar: FunctionComponent = () => {
   const dispatch = useDispatch();
   const token = Cookies.get("user-token");
   const isMobile = window.innerWidth < 600;
-  const [isLight, setIsLight] = useState<Theme>(Theme.light);
+  const theme = useSelector((state: RootState) => state.theme.theme);
+    
   useEffect(() => {
     if (token) {
       fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
@@ -57,18 +59,16 @@ const Menubar: FunctionComponent = () => {
       >
         <IconButton
           onClick={() => {
-            if (isLight === Theme.light) {
+            if (theme === Theme.light) {
               dispatch(setTheme(Theme.dark));
-              setIsLight(Theme.dark);
             } else {
               dispatch(setTheme(Theme.light));
-              setIsLight(Theme.light);
             }
           }}
           disableFocusRipple
           disableRipple
         >
-          {isLight === Theme.light ? (
+          {theme === Theme.light ? (
             <WbSunnyIcon
               sx={{
                 color: "white",

@@ -234,6 +234,7 @@ const Home: FunctionComponent = () => {
               roomId={room._id}
               roomName={room.roomName}
               roomDescription={room.roomDescription}
+              createdBy={room.createdBy}
               users={room.users}
             />
           );

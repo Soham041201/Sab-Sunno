@@ -1,5 +1,12 @@
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  colors,
+  Container,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Cookies from "js-cookie";
 import { FunctionComponent, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -189,6 +196,7 @@ const Login: FunctionComponent = () => {
           justifyContent: "center",
           flexDirection: "column",
           mx: "auto",
+          mb: 3
         }}
       >
         <Typography
@@ -198,12 +206,19 @@ const Login: FunctionComponent = () => {
           }}
         >
           {!isLogin ? `Dont have a account?` : `Already have an account?`}
-          <Button onClick={() => setIsLogin(!isLogin)}>
+          <Button
+            onClick={() => setIsLogin(!isLogin)}
+            sx={{
+              m: 0,
+              p: 0,
+            }}
+          >
             <Typography
               display="inline"
               sx={{
                 fontFamily: "Raleway",
                 textTransform: "none",
+                textDecoration: "underline",
                 color: "#07F0FF",
                 fontWeight: "bold",
               }}
@@ -280,8 +295,25 @@ const Login: FunctionComponent = () => {
               }
               onChange={(e) => setUserName(e.target.value)}
             />
-            <Button variant={"contained"} component="label">
-              Upload Image
+            <Button
+              variant={"outlined"}
+              component="label"
+              sx={{
+                borderColor: colors.orange[50],
+                "&:hover": {
+                  borderColor: colors.purple[100],
+                },
+              }}
+            >
+              <Typography
+                variant={"body1"}
+                sx={{
+                  textTransform: "none",
+                }}
+              >
+                Upload Profile Picture
+              </Typography>
+
               <input
                 hidden
                 type="file"
