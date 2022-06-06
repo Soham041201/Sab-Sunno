@@ -1,9 +1,12 @@
+import { VisibilityOff, Visibility } from "@mui/icons-material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Box,
   Button,
   colors,
   Container,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
@@ -27,6 +30,7 @@ const Login: FunctionComponent = () => {
   const [lastName, setLastName] = useState<string | undefined>();
   const [userName, setUserName] = useState<string | undefined>();
   const [url, setUrl] = useState<string | undefined>();
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,7 +44,7 @@ const Login: FunctionComponent = () => {
         lastName: "test",
         password: "test",
         photoURL: data.photoURL,
-        username: data.displayName,
+        username: data.displayName.trim(),
       };
       await fetch("https://sab-sunno-backend.herokuapp.com/register", {
         method: "POST",
@@ -125,7 +129,7 @@ const Login: FunctionComponent = () => {
   };
 
   const handleSignIn = async () => {
-    if (email && password) {
+    if (email && password && firstName && lastName && userName) {
       await RegisterUsingEmailAndPassword(email, password, async (user) => {
         const userData = {
           email: email,
@@ -196,7 +200,7 @@ const Login: FunctionComponent = () => {
           justifyContent: "center",
           flexDirection: "column",
           mx: "auto",
-          mb: 3
+          mb: 3,
         }}
       >
         <Typography
@@ -243,6 +247,11 @@ const Login: FunctionComponent = () => {
                 my: 1,
                 width: "260px",
               }}
+              type="text"
+                error={`${firstName}`.length > 3 ? false : true}
+              helperText={
+                `${firstName}`.length > 3 ? "" : "First Name is too short"
+              }
               label={
                 <Typography
                   sx={{
@@ -263,6 +272,11 @@ const Login: FunctionComponent = () => {
                 my: 1,
                 width: "260px",
               }}
+              type="text"
+               error={`${lastName}`.length > 3 ? false : true}
+              helperText={
+                `${lastName}`.length > 3 ? "" : "Last Name is too short"
+              }
               label={
                 <Typography
                   sx={{
@@ -283,6 +297,11 @@ const Login: FunctionComponent = () => {
                 my: 1,
                 width: "260px",
               }}
+              type="text"
+                error={`${userName}`.length > 5 ? false : true}
+              helperText={
+                `${userName}`.length > 5 ? "" : "Username Name is too short"
+              }
               label={
                 <Typography
                   sx={{
@@ -315,7 +334,8 @@ const Login: FunctionComponent = () => {
               </Typography>
 
               <input
-                hidden
+                itemType="file"
+                hidden  
                 type="file"
                 onChange={async (e) =>
                   await UploadImage(e, (url) => {
@@ -334,6 +354,9 @@ const Login: FunctionComponent = () => {
             my: 1,
             width: "260px",
           }}
+          type="email"  
+          error={`${email}`.length > 3 ? false : true}
+          helperText={`${email}`.length > 3 ? "" : "Email is invalid"}
           label={
             <Typography
               sx={{
@@ -353,6 +376,7 @@ const Login: FunctionComponent = () => {
             backgroundColor: "rgba(255, 255, 255, 0.5)",
             width: "260px",
           }}
+          type={showPassword ? "text" : "password"}
           label={
             <Typography
               sx={{
@@ -364,6 +388,19 @@ const Login: FunctionComponent = () => {
             </Typography>
           }
           onChange={(e) => setPassword(e.target.value)}
+          InputProps={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPassword(!showPassword)}
+                sx={{
+                  color: "white",
+                }}
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
         />
         <Button
           variant="contained"

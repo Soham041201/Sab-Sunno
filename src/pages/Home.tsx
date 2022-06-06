@@ -46,46 +46,57 @@ const Home: FunctionComponent = () => {
   };
 
   const createNewRoom = async () => {
-    const roomData = {
-      roomName: roomName,
-      roomDescription: roomDescription,
-      users: [user],
-      createdBy: user,
-    };
-    await fetch("https://sab-sunno-backend.herokuapp.com/room", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(roomData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
+    if (roomName.length > 0 && roomDescription.length > 0) {
+      const roomData = {
+        roomName: roomName,
+        roomDescription: roomDescription,
+        users: [user],
+        createdBy: user,
+      };
+      await fetch("https://sab-sunno-backend.herokuapp.com/room", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(roomData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data) {
+            dispatch(
+              setNotification({
+                message: "Room Created Successfully",
+                type: "success",
+              })
+            );
+            navigate(`/room/${data.room._id}`);
+          }
+        })
+        .catch((error) => {
           dispatch(
             setNotification({
-              message: "Room Created Successfully",
-              type: "success",
+              message: "Oh no! Something went wrong. Please try again",
+              type: "error",
             })
           );
-          navigate(`/room/${data.room._id}`);
-        }
-      })
-      .catch((error) => {
-        dispatch(
-          setNotification({
-            message: "Oh no! Something went wrong. Please try again",
-            type: "error",
-          })
-        );
-        console.error("Error:", error);
-      });
+          console.error("Error:", error);
+        });
+    } else {
+      dispatch(
+        setNotification({
+          message: "Please fill all the fields",
+          type: "error",
+        })
+      );
+    }
   };
 
   return (
-    <Container sx={{
-      my:2
-    }}>
+    <Container
+      sx={{
+        my: 2,
+      }}
+    >
       <Typography
         variant={"h1"}
         sx={{
