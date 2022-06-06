@@ -15,7 +15,7 @@ const Menubar: FunctionComponent = () => {
   const token = Cookies.get("user-token");
   const isMobile = window.innerWidth < 600;
   const theme = useSelector((state: RootState) => state.theme.theme);
-    
+
   useEffect(() => {
     if (token) {
       fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
@@ -28,7 +28,7 @@ const Menubar: FunctionComponent = () => {
         .then((data) => {
           if (data) {
             console.log(data);
-            dispatch(setUser({ user: data.user }));
+            data?.user && dispatch(setUser({ user: data.user }));
           }
         })
         .catch((error) => {
