@@ -1,6 +1,6 @@
-import { createTheme, responsiveFontSizes, ThemeOptions } from '@mui/material';
+import { createTheme, responsiveFontSizes, ThemeOptions } from "@mui/material";
 
-const sunoColor = '#FF8413'
+const sunoColor = "#FF8413";
 
 const lightThemeOptions: ThemeOptions = {
   breakpoints: {
@@ -14,42 +14,47 @@ const lightThemeOptions: ThemeOptions = {
   },
 
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
       main: sunoColor,
     },
-    background:{
+    background: {
       default: sunoColor,
-    }
+    },
   },
   typography: {
     h1: {
       fontSize: 60,
-      fontWeight: 'bold',
-      fontFamily: 'Raleway',
+      fontWeight: "bold",
+      fontFamily: "Raleway",
       color: "white",
     },
     h2: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: 'Raleway',
-        color: "white",
+      fontSize: 28,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "white",
     },
     h3: {
       fontSize: 18,
-      fontWeight: 'bold',
-      fontFamily: 'Raleway',
+      fontWeight: "bold",
+      fontFamily: "Raleway",
       color: "white",
-  },
-  body1:{
-    fontSize: 14,
-    fontWeight: 'bold',
-    fontFamily: 'Raleway',
-    color: "white",
-  }
+    },
+    body1: {
+      fontSize: 14,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "#FFC77D",
+    },
+    body2: {
+      fontSize: 12,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "white",
+    }
   },
 };
-
 
 const darkThemeOptions: ThemeOptions = {
   breakpoints: {
@@ -63,41 +68,47 @@ const darkThemeOptions: ThemeOptions = {
   },
 
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
-      main: '#FF8413',
+      main: "#FF8413",
     },
-    background:{
-      default: '#121212',
-    }
+    background: {
+      default: "#121212",
+    },
   },
   typography: {
     h1: {
       fontSize: 60,
-      fontWeight: 'bold',
-      fontFamily: 'Raleway',
+      fontWeight: "bold",
+      fontFamily: "Raleway",
       color: "white",
     },
     h2: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontFamily: 'Raleway',
-        color: "white",
+      fontSize: 28,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "white",
     },
     h3: {
       fontSize: 18,
-      fontWeight: 'bold',
-      fontFamily: 'Raleway',
+      fontWeight: "bold",
+      fontFamily: "Raleway",
       color: "white",
+    },
+    body1: {
+      fontSize: 14,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "#b388ff",
+    },
+    body2: {
+      fontSize: 12,
+      fontWeight: "bold",
+      fontFamily: "Raleway",
+      color: "white",
+    }
   },
-  body1:{
-    fontSize: 14,
-    fontWeight: 'bold',
-    fontFamily: 'Raleway',
-    color: "white",
-  }
-  },
-};  
+};
 
 const lightTheme = responsiveFontSizes(createTheme(lightThemeOptions));
 const darkTheme = responsiveFontSizes(createTheme(darkThemeOptions));

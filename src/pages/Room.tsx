@@ -166,7 +166,7 @@ const Room: FunctionComponent = () => {
                             borderRadius: "20px",
                           }}
                         >
-                          <Typography textAlign={"center"}>host</Typography>
+                          <Typography textAlign={"center"} variant={'body2'}>host</Typography>
                         </Box>
                       )}
                     </Box>

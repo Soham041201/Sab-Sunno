@@ -171,6 +171,7 @@ const Home: FunctionComponent = () => {
                 my: 1,
                 width: "50%",
               }}
+              required
               label={
                 <Typography
                   sx={{
@@ -191,6 +192,7 @@ const Home: FunctionComponent = () => {
                 my: 1,
                 width: "50%",
               }}
+              required
               label={
                 <Typography
                   sx={{
