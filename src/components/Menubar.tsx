@@ -60,8 +60,10 @@ const Menubar: FunctionComponent = () => {
         <IconButton
           onClick={() => {
             if (theme === Theme.light) {
+              localStorage.setItem("theme", Theme.dark);
               dispatch(setTheme(Theme.dark));
             } else {
+              localStorage.setItem("theme", Theme.light);
               dispatch(setTheme(Theme.light));
             }
           }}
@@ -70,7 +72,7 @@ const Menubar: FunctionComponent = () => {
         >
           {theme === Theme.light ? (
             <WbSunnyIcon
-              sx={{
+              sx={{ 
                 color: "white",
               }}
             />

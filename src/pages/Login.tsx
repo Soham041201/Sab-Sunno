@@ -7,6 +7,8 @@ import {
   Container,
   IconButton,
   InputAdornment,
+  InputLabel,
+  OutlinedInput,
   TextField,
   Typography,
 } from "@mui/material";
@@ -248,7 +250,7 @@ const Login: FunctionComponent = () => {
                 width: "260px",
               }}
               type="text"
-                error={`${firstName}`.length > 3 ? false : true}
+              error={`${firstName}`.length > 3 ? false : true}
               helperText={
                 `${firstName}`.length > 3 ? "" : "First Name is too short"
               }
@@ -272,8 +274,7 @@ const Login: FunctionComponent = () => {
                 my: 1,
                 width: "260px",
               }}
-              type="text"
-               error={`${lastName}`.length > 3 ? false : true}
+              error={`${lastName}`.length > 3 ? false : true}
               helperText={
                 `${lastName}`.length > 3 ? "" : "Last Name is too short"
               }
@@ -297,8 +298,7 @@ const Login: FunctionComponent = () => {
                 my: 1,
                 width: "260px",
               }}
-              type="text"
-                error={`${userName}`.length > 5 ? false : true}
+              error={`${userName}`.length > 5 ? false : true}
               helperText={
                 `${userName}`.length > 5 ? "" : "Username Name is too short"
               }
@@ -335,8 +335,7 @@ const Login: FunctionComponent = () => {
 
               <input
                 itemType="file"
-                hidden  
-                type="file"
+                hidden
                 onChange={async (e) =>
                   await UploadImage(e, (url) => {
                     setUrl(url);
@@ -354,7 +353,7 @@ const Login: FunctionComponent = () => {
             my: 1,
             width: "260px",
           }}
-          type="email"  
+          type="email"
           error={`${email}`.length > 3 ? false : true}
           helperText={`${email}`.length > 3 ? "" : "Email is invalid"}
           label={
@@ -369,8 +368,8 @@ const Login: FunctionComponent = () => {
           }
           onChange={(e) => setEmail(e.target.value)}
         />
-        <TextField
-          variant="outlined"
+        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+        <OutlinedInput
           size={"small"}
           sx={{
             backgroundColor: "rgba(255, 255, 255, 0.5)",
@@ -388,7 +387,7 @@ const Login: FunctionComponent = () => {
             </Typography>
           }
           onChange={(e) => setPassword(e.target.value)}
-          InputProps={
+          endAdornment={
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useRef } from "react";
 import socketInit from "../socket";
-import  { User, RoomUser } from "../types.defined";
+import { User, RoomUser } from "../types.defined";
 import { useStateWithCallback } from "./useStateWithCallback";
 
 export const useWebRTC = (roomId: any, user: User) => {
@@ -61,7 +61,7 @@ export const useWebRTC = (roomId: any, user: User) => {
       });
       socket.current.emit("join", { roomId, user });
     };
-    
+
     initChat();
     return () => {
       localMediaStream.current?.getTracks().forEach((track: any) => {
@@ -73,13 +73,13 @@ export const useWebRTC = (roomId: any, user: User) => {
         delete connections?.current[peerId];
         delete audioElement?.current[peerId];
       }
+
       socket.current.emit("leave", { roomId, user });
       socket.current.off("session-description");
       socket.current.off("add-peer");
       socket.current.off("ice-candidate");
       socket.current.off("remove-peer");
     };
-
   }, []);
 
   const setMute = async (muted: boolean, userId: string) => {
@@ -188,10 +188,10 @@ export const useWebRTC = (roomId: any, user: User) => {
 
   const handleRemovePeer = async ({
     peerId,
-    userId,
+    user,
   }: {
     peerId: string;
-    userId: string;
+    user: string;
   }) => {
     if (connections.current[peerId]) {
       connections.current[peerId].close();
@@ -199,7 +199,7 @@ export const useWebRTC = (roomId: any, user: User) => {
     delete connections.current[peerId];
     delete audioElement.current[peerId];
     setClients((list: User[]) =>
-      list.filter((client: { _id: String }) => client._id !== userId)
+      list.filter((client: { _id: String }) => client._id !== user)
     );
   };
 
