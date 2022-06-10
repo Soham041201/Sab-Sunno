@@ -27,7 +27,7 @@ const Room: FunctionComponent = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`https://sab-sunno-backend.herokuapp.com/room/${roomId}`, {
+    fetch(`http://localhost:8000/room/${roomId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,6 @@ const Room: FunctionComponent = () => {
       .then((data) => {
         if (data) {
           setRoom(data.room);
-          console.log(data);
         }
       })
       .catch((error) => {
@@ -87,9 +86,11 @@ const Room: FunctionComponent = () => {
           justifyContent: "center",
         }}
       >
-        <Box sx={{
-          my:1
-        }}>
+        <Box
+          sx={{
+            my: 1,
+          }}
+        >
           <Typography variant={"h1"}>{room.roomName}</Typography>
           <Typography variant={"h3"}>{room.roomDescription}</Typography>
         </Box>
@@ -166,7 +167,9 @@ const Room: FunctionComponent = () => {
                             borderRadius: "20px",
                           }}
                         >
-                          <Typography textAlign={"center"} variant={'body2'}>host</Typography>
+                          <Typography textAlign={"center"} variant={"body2"}>
+                            host
+                          </Typography>
                         </Box>
                       )}
                     </Box>

@@ -44,6 +44,7 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
           password: "",
           photoURL: "",
           username: "",
+          isAuthenticated:false
         },
       })
     );

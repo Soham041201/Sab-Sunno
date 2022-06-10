@@ -10,12 +10,40 @@ import Home from "./Home";
 import Login from "./Login";
 import NotFound from "./NotFound";
 import Room from "./Room";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import HomeRoute from "../components/HomeRoute";
+import Authenticate from "./Authenticate";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
+import { setUser } from "../redux/slice/userSlice";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const token = Cookies.get("user-token");
+  const dispatch = useDispatch()
+  useEffect(() => {
+    if (token) {
+      fetch(`http://localhost:8000/user/${token}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data) {
+            data?.user && dispatch(setUser({ user: data.user }));
+            localStorage.setItem("isAuthenticated",data.user.isAuthenticated)
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
       <CssBaseline />
@@ -31,6 +59,7 @@ function App() {
               </HomeRoute>
             }
           />
+          <Route path="/authenticate" element={<Authenticate />} />
           <Route
             path="/login"
             element={

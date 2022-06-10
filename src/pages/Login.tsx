@@ -1,9 +1,8 @@
-import { VisibilityOff, Visibility } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Box,
   Button,
-  colors,
   Container,
   IconButton,
   InputAdornment,
@@ -16,11 +15,11 @@ import Cookies from "js-cookie";
 import { FunctionComponent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import CustomLoader from "../components/Loader";
 import Title from "../components/Title";
 import GoogleSignIn from "../functions/authProviders/googleSign";
 import { LoginWithEmail } from "../functions/authProviders/login";
 import RegisterUsingEmailAndPassword from "../functions/authProviders/register";
-import UploadImage from "../functions/dataBase/uploadImage";
 import GoogleIcon from "../images/google.svg";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { setUser } from "../redux/slice/userSlice";
@@ -30,25 +29,27 @@ const Login: FunctionComponent = () => {
   const [password, setPassword] = useState<string | undefined>();
   const [firstName, setFirstName] = useState<string | undefined>();
   const [lastName, setLastName] = useState<string | undefined>();
-  const [userName, setUserName] = useState<string | undefined>();
-  const [url, setUrl] = useState<string | undefined>();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState<boolean>(false);
 
   const handleGoogleSignIn = () => {
+    setIsLoading(true);
     GoogleSignIn(async (data) => {
       const userData: any = {
         email: data.email,
-        firstName: data.displayName,
-        lastName: "test",
-        password: "test",
+        firstName: data.displayName.split(" ")[0],
+        lastName: data.displayName.split(" ")[1],
+        password: `${
+          data.displayName.split(" ")[0] + data.displayName.split(" ")[1]
+        }`,
         photoURL: data.photoURL,
-        username: data.displayName.trim(),
       };
-      await fetch("https://sab-sunno-backend.herokuapp.com/register", {
+      console.log(userData);
+      await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +58,8 @@ const Login: FunctionComponent = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          setIsLoading(false);
+
           dispatch(setUser({ user: data.user }));
           dispatch(
             setNotification({
@@ -65,7 +67,10 @@ const Login: FunctionComponent = () => {
               type: "success",
             })
           );
-          navigate("/home");
+          if (data.isAuthenticated) {
+            navigate("/home");
+          }
+          navigate("/authenticate");
           Cookies.remove("user-token");
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + 1 * 7);
@@ -88,8 +93,8 @@ const Login: FunctionComponent = () => {
   const handleLogin = async () => {
     if (email && password) {
       LoginWithEmail(email, password, async (user) => {
-        console.log(user);
-        await fetch("https://sab-sunno-backend.herokuapp.com/user", {
+        setIsLoading(true);
+        await fetch("http://localhost:8000/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +105,7 @@ const Login: FunctionComponent = () => {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
+            setIsLoading(false);
             dispatch(setUser(data));
             dispatch(
               setNotification({
@@ -131,18 +136,18 @@ const Login: FunctionComponent = () => {
   };
 
   const handleSignIn = async () => {
-    if (email && password && firstName && lastName && userName) {
+    setIsLoading(true);
+
+    if (email && password && firstName && lastName) {
       await RegisterUsingEmailAndPassword(email, password, async (user) => {
         const userData = {
           email: email,
           firstName: firstName,
           lastName: lastName,
           password: password,
-          photoURL: url,
-          username: userName,
+          isAuthenticated: false,
         };
-        console.log(JSON.stringify(userData));
-        await fetch("https://sab-sunno-backend.herokuapp.com/register", {
+        await fetch("http://localhost:8000/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -151,6 +156,7 @@ const Login: FunctionComponent = () => {
         })
           .then((response) => response.json())
           .then((data: any) => {
+            setIsLoading(false);
             console.log(data.user);
             dispatch(setUser(data.user));
             dispatch(
@@ -187,8 +193,10 @@ const Login: FunctionComponent = () => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
+      {isLoading && <CustomLoader />}
       <Box
         sx={{
           my: 5,
@@ -290,59 +298,6 @@ const Login: FunctionComponent = () => {
               }
               onChange={(e) => setLastName(e.target.value)}
             />
-            <TextField
-              variant="outlined"
-              size={"small"}
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.5)",
-                my: 1,
-                width: "260px",
-              }}
-              error={`${userName}`.length > 5 ? false : true}
-              helperText={
-                `${userName}`.length > 5 ? "" : "Username Name is too short"
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontFamily: "Raleway",
-                    color: "white",
-                  }}
-                >
-                  Username
-                </Typography>
-              }
-              onChange={(e) => setUserName(e.target.value)}
-            />
-            <Button
-              variant={"outlined"}
-              component="label"
-              sx={{
-                borderColor: colors.orange[50],
-                "&:hover": {
-                  borderColor: colors.purple[100],
-                },
-              }}
-            >
-              <Typography
-                variant={"body1"}
-                sx={{
-                  textTransform: "none",
-                }}
-              >
-                Upload Profile Picture
-              </Typography>
-
-              <input
-                itemType="file"
-                hidden
-                onChange={async (e) =>
-                  await UploadImage(e, (url) => {
-                    setUrl(url);
-                  })
-                }
-              />
-            </Button>
           </Box>
         )}
         <TextField
@@ -376,16 +331,7 @@ const Login: FunctionComponent = () => {
             width: "260px",
           }}
           type={showPassword ? "text" : "password"}
-          label={
-            <Typography
-              sx={{
-                fontFamily: "Raleway",
-                color: "white",
-              }}
-            >
-              Password
-            </Typography>
-          }
+          label={"Password"}
           onChange={(e) => setPassword(e.target.value)}
           endAdornment={
             <InputAdornment position="end">

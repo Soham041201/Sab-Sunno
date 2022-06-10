@@ -15,6 +15,7 @@ const initialState: userState = {
     password: "",
     photoURL: "",
     username: "",
+    isAuthenticated: false,
   },
 };
 
@@ -34,7 +35,7 @@ export const { setUser } = usersSlice.actions;
 export const userPictureSelector = (state: RootState) =>
   state.user.user.photoURL;
 export const userNameSelector = (state: RootState) => state.user.user.firstName;
-
+export const userAuthenticationSelector = (state: RootState) => state.user.user.isAuthenticated;
 export const selectUser = (state: RootState) => state.user.user;
 
 export default usersSlice.reducer;

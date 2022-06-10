@@ -28,12 +28,11 @@ const Home: FunctionComponent = () => {
 
   const [rooms, setRooms] = useState<any>([]);
   useEffect(() => {
-    fetch("https://sab-sunno-backend.herokuapp.com/rooms", {
+    fetch("http://localhost:8000/rooms", {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.rooms);
         setRooms(data.rooms);
       })
       .catch((error) => {
@@ -53,7 +52,7 @@ const Home: FunctionComponent = () => {
         users: [user],
         createdBy: user,
       };
-      await fetch("https://sab-sunno-backend.herokuapp.com/room", {
+      await fetch("http://localhost:8000/room", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
