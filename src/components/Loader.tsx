@@ -10,7 +10,7 @@ return(
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: "screen",
+          width: 'full',
           height: "screen",
           zIndex: 1,
         }}

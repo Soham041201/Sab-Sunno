@@ -1,3 +1,5 @@
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Avatar,
   Box,
@@ -6,15 +8,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
-import UploadImage from "../functions/dataBase/uploadImage";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Cookies from "js-cookie";
+import { FunctionComponent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userPictureSelector } from "../redux/slice/userSlice";
-import { setNotification } from "../redux/slice/notificationSlice";
 import { useNavigate } from "react-router-dom";
+import UploadImage from "../functions/dataBase/uploadImage";
+import { setNotification } from "../redux/slice/notificationSlice";
+import { userPictureSelector } from "../redux/slice/userSlice";
 
 const Authenticate: FunctionComponent = () => {
   const photoURL = useSelector(userPictureSelector);
@@ -171,6 +171,8 @@ const Authenticate: FunctionComponent = () => {
                       type: "success",
                     })
                   );
+                  Cookies.remove("isAuthenticated");
+                  Cookies.set("isAuthenticated", data?.user?.isAuthenticated);
                   navigate("/home");
                 }
               })

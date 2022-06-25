@@ -4,16 +4,17 @@ import { AppBar, Box, IconButton, Typography } from "@mui/material";
 import { FunctionComponent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../redux/slice/themeSlice";
-import { userPictureSelector } from "../redux/slice/userSlice";
+import { selectUser } from "../redux/slice/userSlice";
 import { RootState } from "../redux/store";
 import { Theme } from "../types.defined";
 import MenuTab from "./MenuTab";
 const Menubar: FunctionComponent = () => {
+  
+  const user = useSelector(selectUser);
 
-  const photoURL = useSelector(userPictureSelector);
   const dispatch = useDispatch();
   const isMobile = window.innerWidth < 600;
-  const theme = useSelector((state: RootState) => state.theme.theme);
+  const theme = useSelector((state: RootState) => state?.theme.theme);
 
   return (
     <AppBar
@@ -22,12 +23,14 @@ const Menubar: FunctionComponent = () => {
         boxShadow: "none",
         display: "flex",
         flexDirection: "row",
-        p: 2,
+        p: 1,
         justifyContent: "space-between",
       }}
       position="static"
     >
-      <Typography variant={"h2"}>{isMobile ? `Ss.` : `Sab Sunno.`}</Typography>
+      <Typography variant={"h2"} sx={{
+        mt:1
+      }}>{isMobile ? `Ss.` : `Sab Sunno.`}</Typography>
 
       <Box
         sx={{
@@ -57,7 +60,7 @@ const Menubar: FunctionComponent = () => {
             <NightlightIcon />
           )}
         </IconButton>
-        <MenuTab src={photoURL} />
+        <MenuTab user={user}/>
       </Box>
     </AppBar>
   );

@@ -9,13 +9,15 @@ import {
   Container,
   Grid,
   IconButton,
+  Skeleton,
   Typography,
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWebRTC } from "../hooks/useWebRTC";
 import muteIcon from "../images/mute.png";
+import { setNotification } from "../redux/slice/notificationSlice";
 import { selectUser } from "../redux/slice/userSlice";
 import { RoomUser } from "../types.defined";
 const Room: FunctionComponent = () => {
@@ -25,6 +27,21 @@ const Room: FunctionComponent = () => {
   const { clients, provideRef, handleMute } = useWebRTC(roomId, user);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const copy = () => {
+    const el = document.createElement("input");
+    el.value =
+      "Join me and my friends having a amazing conversation at " +
+      window.location.href;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    dispatch(
+      setNotification({ type: "success", message: "Link copied to clipboard" })
+    );
+  };
 
   useEffect(() => {
     fetch(`http://localhost:8000/room/${roomId}`, {
@@ -53,32 +70,54 @@ const Room: FunctionComponent = () => {
 
   return (
     <Container>
-      <Button
-        startIcon={
-          <ArrowBackIcon
-            sx={{
-              color: "white",
-            }}
-          />
-        }
+      <Box
         sx={{
-          mx: 5,
+          display: "flex",
+          justifyContent: "space-between",
         }}
-        onClick={() => navigate("/home")}
       >
-        <Typography
-          variant={"h3"}
+        <Button
+          startIcon={
+            <ArrowBackIcon
+              sx={{
+                color: "white",
+              }}
+            />
+          }
           sx={{
-            textTransform: "none",
-            textDecoration: "underline",
-            textUnderlineOffset: 4,
-            textDecorationColor: "#b388ff",
-            textDecorationThickness: "2px",
+            mx: 5,
+            my: 1,
           }}
+          onClick={() => navigate("/home")}
         >
-          back to rooms
-        </Typography>
-      </Button>
+          <Typography
+            variant={"h3"}
+            sx={{
+              textTransform: "none",
+              textDecoration: "underline",
+              textUnderlineOffset: 4,
+              textDecorationColor: "#b388ff",
+              textDecorationThickness: "2px",
+            }}
+          >
+            back to rooms
+          </Typography>
+        </Button>
+        <Button
+          variant={"contained"}
+          disableElevation
+          sx={{
+            backgroundColor: "#b388ff",
+            borderRadius: "15px",
+            textTransform: "none",
+            my: 1,
+          }}
+          onClick={copy}
+        >
+          <Typography variant={"h3"}>Invite a friend</Typography>
+        </Button>
+      </Box>
+
       <Container
         sx={{
           display: "flex",
@@ -88,11 +127,25 @@ const Room: FunctionComponent = () => {
       >
         <Box
           sx={{
-            my: 1,
+            textAlign: "center",
+            mb: 1,
           }}
         >
-          <Typography variant={"h1"}>{room.roomName}</Typography>
-          <Typography variant={"h3"}>{room.roomDescription}</Typography>
+          <Typography variant={"h1"}>
+            {room.roomName ? (
+              room.roomName
+            ) : (
+              <Skeleton sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+            )}
+          </Typography>
+
+          <Typography variant={"h3"}>
+            {room.roomDescription ? (
+              room.roomDescription
+            ) : (
+              <Skeleton sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+            )}
+          </Typography>
         </Box>
 
         <Box
@@ -156,8 +209,8 @@ const Room: FunctionComponent = () => {
                         />
                       </Badge>
 
-                      <Typography variant={"body1"} sx={{ mt: 1 }}>
-                        {client.firstName}
+                      <Typography variant={"body2"} sx={{ mt: 1 }}>
+                        {client.username}
                       </Typography>
                       {room?.createdBy?._id === client?._id && (
                         <Box

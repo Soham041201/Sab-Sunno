@@ -59,7 +59,6 @@ const Login: FunctionComponent = () => {
         .then((response) => response.json())
         .then((data) => {
           setIsLoading(false);
-
           dispatch(setUser({ user: data.user }));
           dispatch(
             setNotification({
@@ -67,16 +66,18 @@ const Login: FunctionComponent = () => {
               type: "success",
             })
           );
-          if (data.isAuthenticated) {
-            navigate("/home");
-          }
-          navigate("/authenticate");
+
           Cookies.remove("user-token");
+          Cookies.remove("isAuthenticated");
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + 1 * 7);
           Cookies.set("user-token", data.user._id, {
             expires: expiresAt,
           });
+          Cookies.set("isAuthenticated", data.user.isAuthenticated, {
+            expires: expiresAt,
+          });
+          navigate("/authenticate");
         })
         .catch((error) => {
           dispatch(
@@ -114,11 +115,15 @@ const Login: FunctionComponent = () => {
               })
             );
             navigate("/home");
+            console.log(data?.user);
             Cookies.remove("user-token");
-
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 1 * 7);
             Cookies.set("user-token", data.user._id, {
+              expires: expiresAt,
+            });
+            Cookies.remove("isAuthenticated");
+            Cookies.set("isAuthenticated", data.user.isAuthenticated, {
               expires: expiresAt,
             });
           })
@@ -165,12 +170,14 @@ const Login: FunctionComponent = () => {
                 type: "success",
               })
             );
-
             navigate("/home");
             Cookies.remove("user-token");
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 1 * 7);
             Cookies.set("user-token", data.user._id, {
+              expires: expiresAt,
+            });
+            Cookies.set("isAuthenticated", data.user?.isAuthenticated, {
               expires: expiresAt,
             });
           })

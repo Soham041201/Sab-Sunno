@@ -68,13 +68,14 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   return (
     <Box
       sx={{
-        m: 2,
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         p: 2,
-        borderRadius: "20px",
+        width: "300px",
+        borderRadius: "30px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "left",
+        "&:hover": {},
       }}
     >
       <Box
