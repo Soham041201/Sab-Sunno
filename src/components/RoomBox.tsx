@@ -75,7 +75,6 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "left",
-        "&:hover": {},
       }}
     >
       <Box
@@ -101,11 +100,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
               sx={{
                 color: "white",
                 mb: 0.8,
-                "&:hover": {
-                  transform: "scale(1.1)",
-                  transition: "all 0.2s linear",
-                },
-              }}
+                }}
             />
           }
         >
@@ -114,9 +109,6 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
             sx={{
               alignSelf: "flex-start",
               textTransform: "none",
-              "&:hover": {
-                color: "#b388ff",
-              },
             }}
           >{`Join this room`}</Typography>
         </Button>

@@ -177,6 +177,9 @@ const Room: FunctionComponent = () => {
                         flexDirection: "column",
                         alignItems: "center",
                       }}
+                      onClick={() => {
+                        navigate(`/profile/${client._id}`);
+                      }}
                     >
                       <audio
                         autoPlay

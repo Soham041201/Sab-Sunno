@@ -35,7 +35,6 @@ function App() {
         .then((data) => {
           if (data) {
             data?.user && dispatch(setUser({ user: data.user }));
- 
           }
         })
         .catch((error) => {

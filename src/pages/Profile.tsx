@@ -6,8 +6,9 @@ import {
   Container,
   Divider,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -17,6 +18,7 @@ import { User } from "../types.defined";
 
 const Profile = () => {
   const { userId } = useParams();
+  const userToken = Cookies.get("user-token");
   const [user, setUser] = useState<User>();
   const isMobile = window.innerWidth < 600;
   const [url, setUrl] = useState<string | undefined>("");
@@ -24,6 +26,9 @@ const Profile = () => {
   const [lname, setLname] = useState<string | undefined>("");
   const [username, setUsername] = useState<string | undefined>("");
   const [about, setAbout] = useState<string | undefined>("");
+  const isSelf = userId === userToken;
+
+  console.log(isSelf);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -51,6 +56,40 @@ const Profile = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+  const handleUpdate = async () => {
+    await fetch(`http://localhost:8000/user/update/${user?._id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        username: username,
+        photoURL: url,
+        firstName: fname,
+        lastName: lname,
+        about: about,
+        password: user?.password,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          console.log(data);
+          dispatch(
+            setNotification({
+              message: "Your profile has been updated",
+              type: "success",
+            })
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
   return (
     <Container
       sx={{
@@ -80,6 +119,7 @@ const Profile = () => {
               disableElevation
               disableFocusRipple
               disableTouchRipple
+              disabled={!isSelf}
             >
               <Avatar
                 sx={{
@@ -107,12 +147,13 @@ const Profile = () => {
                     setUrl(url);
                   })
                 }
+                disabled={!isSelf}
               />
             </Button>
             <TextField
               defaultValue={user.username}
               variant={"standard"}
-              disabled={false}
+              disabled={!isSelf}
               size={"medium"}
               sx={{
                 m: 1,
@@ -135,7 +176,7 @@ const Profile = () => {
               <TextField
                 defaultValue={user.firstName}
                 variant={"standard"}
-                disabled={false}
+                disabled={!isSelf}
                 size={"medium"}
                 sx={{
                   m: 1,
@@ -147,7 +188,7 @@ const Profile = () => {
               <TextField
                 defaultValue={user.lastName}
                 variant={"standard"}
-                disabled={false}
+                disabled={!isSelf}
                 size={"medium"}
                 sx={{
                   m: 1,
@@ -202,7 +243,7 @@ const Profile = () => {
             <TextField
               defaultValue={user.about}
               variant={"standard"}
-              disabled={false}
+              disabled={!isSelf}
               size={"medium"}
               sx={{
                 m: 1,
@@ -226,37 +267,8 @@ const Profile = () => {
             backgroundColor: "rgba(248, 248, 248, 0.8)",
           },
         }}
-        onClick={async () => {
-          await fetch(`http://localhost:8000/user/update/${user?._id}`, {
-            method: "PUT",
-            body: JSON.stringify({
-              username: username,
-              photoURL: url,
-              firstName: fname,
-              lastName: lname,
-              about: about,
-              password: user?.password,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data) {
-                console.log(data);
-                dispatch(
-                  setNotification({
-                    message: "Your profile has been updated",
-                    type: "success",
-                  })
-                );
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        }}
+        onClick={handleUpdate}
+        disabled={!isSelf}
       >
         <Typography
           sx={{
