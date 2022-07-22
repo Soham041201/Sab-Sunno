@@ -19,7 +19,7 @@ const lightThemeOptions: ThemeOptions = {
       main: sunoColor,
     },
     background: {
-      default: sunoColor,
+      default: "#e3f2fd",
     },
   },
   typography: {
@@ -27,13 +27,13 @@ const lightThemeOptions: ThemeOptions = {
       fontSize: 60,
       fontWeight: "bold",
       fontFamily: "Raleway",
-      color: "white",
+      color: "#42a5f5",
     },
     h2: {
       fontSize: 28,
       fontWeight: "bold",
       fontFamily: "Raleway",
-      color: "white",
+      color: "black",
     },
     h3: {
       fontSize: 18,

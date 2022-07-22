@@ -6,6 +6,8 @@ export type User = {
   password: string;
   photoURL: string;
   username: string;
+  isAuthenticated: boolean
+  about: string
 };
 
 type RoomAdd = {

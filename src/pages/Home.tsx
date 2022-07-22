@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
   TextField,
   Typography,
 } from "@mui/material";
@@ -24,16 +25,16 @@ const Home: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [roomName, setRoomName] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
+
   const navigate = useNavigate();
 
   const [rooms, setRooms] = useState<any>([]);
   useEffect(() => {
-    fetch("https://sab-sunno-backend.herokuapp.com/rooms", {
+    fetch("http://localhost:8000/rooms", {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.rooms);
         setRooms(data.rooms);
       })
       .catch((error) => {
@@ -53,7 +54,7 @@ const Home: FunctionComponent = () => {
         users: [user],
         createdBy: user,
       };
-      await fetch("https://sab-sunno-backend.herokuapp.com/room", {
+      await fetch("http://localhost:8000/room", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -238,20 +239,23 @@ const Home: FunctionComponent = () => {
           </DialogActions>
         </Dialog>
       </div>
-
-      {rooms &&
-        rooms?.map((room: any) => {
-          return (
-            <RoomBox
-              key={rooms.indexOf(room)}
-              roomId={room._id}
-              roomName={room.roomName}
-              roomDescription={room.roomDescription}
-              createdBy={room.createdBy}
-              users={room.users}
-            />
-          );
-        })}
+      <Grid container spacing={3}>
+        {rooms &&
+          rooms?.map((room: any) => {
+            return (
+              <Grid item xs={12} sm={6} md={3} key={rooms.indexOf(room)}>
+                <RoomBox
+                  key={rooms.indexOf(room)}
+                  roomId={room._id}
+                  roomName={room.roomName}
+                  roomDescription={room.roomDescription}
+                  createdBy={room.createdBy}
+                  users={room.users}
+                />
+              </Grid>
+            );
+          })}
+      </Grid>
     </Container>
   );
 };

@@ -12,7 +12,7 @@ const UploadImage =async  (
   const refer = ref(storage, `/images/${e.target.files[0].name}`);
   await uploadBytes(refer, e.target.files[0])
     .then((snapshot) => {
-      console.log("File Uploaded");
+      console.log(snapshot)
     })
     .then(async () => {
       await getDownloadURL(ref(storage, `images/${e.target.files[0].name}`)).then(

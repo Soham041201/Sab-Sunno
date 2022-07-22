@@ -12,17 +12,19 @@ import Cookies from "js-cookie";
 import * as React from "react";
 import { FunctionComponent } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { setUser } from "../redux/slice/userSlice";
+import { User } from "../types.defined";
 
 interface MenuTabProps {
-  src: string | undefined;
+  user: User;
 }
 
-const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
-  
+const MenuTab: FunctionComponent<MenuTabProps> = ({ user }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const dispatch = useDispatch();
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,8 +34,6 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
   };
 
   const handleLogout = () => {
-
-    
     dispatch(
       setUser({
         user: {
@@ -44,16 +44,19 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
           password: "",
           photoURL: "",
           username: "",
+          isAuthenticated: false,
+          about: "",
         },
       })
     );
     Cookies.remove("user-token");
+    Cookies.remove("isAuthenticated");
     window.location.href = "/login";
   };
 
   return (
     <React.Fragment>
-      <Tooltip title={<Typography variant={"body1"}>My account</Typography>}>
+      <Tooltip title={<Typography variant={"body2"}>My Account</Typography>}>
         <IconButton
           onClick={handleClick}
           size="small"
@@ -62,7 +65,7 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          <Avatar src={src} />
+          <Avatar src={user.photoURL} />
         </IconButton>
       </Tooltip>
       <Menu
@@ -100,7 +103,7 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => navigate(`/profile/${user._id}`)}>
           <ListItemIcon>
             <Person fontSize="small" />
           </ListItemIcon>
@@ -110,7 +113,7 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ src }) => {
               color: "gray",
             }}
           >
-            My account
+            {user.username ? user.username : `My account`}
           </Typography>
         </MenuItem>
         <MenuItem>
