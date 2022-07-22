@@ -33,7 +33,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (userId) {
-      fetch(`https://sab-sunno-backend.herokuapp.com/${userId}`, {
+      fetch(`https://sab-sunno-backend.herokuapp.com/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
