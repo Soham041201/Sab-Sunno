@@ -152,7 +152,7 @@ const Authenticate: FunctionComponent = () => {
             },
           }}
           onClick={async () => {
-            await fetch(`http://localhost:8000/user/${token}`, {
+            await fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
               method: "PUT",
               body: JSON.stringify({
                 username: userName,

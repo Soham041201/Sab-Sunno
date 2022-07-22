@@ -49,7 +49,7 @@ const Login: FunctionComponent = () => {
         photoURL: data.photoURL,
       };
       console.log(userData);
-      await fetch("http://localhost:8000/register", {
+      await fetch("https://sab-sunno-backend.herokuapp.com/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ const Login: FunctionComponent = () => {
     if (email && password) {
       LoginWithEmail(email, password, async (user) => {
         setIsLoading(true);
-        await fetch("http://localhost:8000/user", {
+        await fetch("https://sab-sunno-backend.herokuapp.com/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -152,7 +152,7 @@ const Login: FunctionComponent = () => {
           password: password,
           isAuthenticated: false,
         };
-        await fetch("http://localhost:8000/register", {
+        await fetch("https://sab-sunno-backend.herokuapp.com/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -41,7 +41,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   };
 
   const handleDelete = async () => {
-    await fetch(`http://localhost:8000/room/${roomId}`, {
+    await fetch(`https://sab-sunno-backend.herokuapp.com/room/${roomId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -30,7 +30,7 @@ const Home: FunctionComponent = () => {
 
   const [rooms, setRooms] = useState<any>([]);
   useEffect(() => {
-    fetch("http://localhost:8000/rooms", {
+    fetch("https://sab-sunno-backend.herokuapp.com/rooms", {
       method: "GET",
     })
       .then((response) => response.json())
@@ -54,7 +54,7 @@ const Home: FunctionComponent = () => {
         users: [user],
         createdBy: user,
       };
-      await fetch("http://localhost:8000/room", {
+      await fetch("https://sab-sunno-backend.herokuapp.com/room", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

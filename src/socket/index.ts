@@ -7,7 +7,7 @@ const socketInit = () => {
     timeout: 10000,
     reconnectionAttempts: "Infinity",
   };
-  return io("http://localhost:8000", options);
+  return io("https://sab-sunno-backend.herokuapp.com", options);
 };
 
 export default socketInit;

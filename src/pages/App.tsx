@@ -25,7 +25,7 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (token) {
-      fetch(`http://localhost:8000/user/${token}`, {
+      fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

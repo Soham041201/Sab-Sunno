@@ -33,7 +33,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:8000/user/${userId}`, {
+      fetch(`https://sab-sunno-backend.herokuapp.com/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const Profile = () => {
 
 
   const handleUpdate = async () => {
-    await fetch(`http://localhost:8000/user/update/${user?._id}`, {
+    await fetch(`https://sab-sunno-backend.herokuapp.com/user/update/${user?._id}`, {
       method: "PUT",
       body: JSON.stringify({
         username: username,
