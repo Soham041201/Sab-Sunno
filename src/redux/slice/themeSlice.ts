@@ -5,7 +5,7 @@ interface ThemeState {
   theme: Theme;
 }
 
-const theme = localStorage.getItem("theme") || "light";
+const theme = localStorage.getItem("theme") || "dark";
 const initialState: ThemeState = {
   theme: theme as Theme ?? Theme.dark,
 };
