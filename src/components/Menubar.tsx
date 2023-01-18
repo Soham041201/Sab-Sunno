@@ -47,7 +47,7 @@ const Menubar: FunctionComponent = () => {
           display: "flex",
         }}
       >
-        <IconButton
+        {/* <IconButton
           onClick={() => {
             if (theme === Theme.light) {
               localStorage.setItem("theme", Theme.dark);
@@ -69,7 +69,7 @@ const Menubar: FunctionComponent = () => {
           ) : (
             <NightlightIcon />
           )}
-        </IconButton>
+        </IconButton> */}
         <MenuTab user={user} />
       </Box>
     </AppBar>

@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import RoomBox from "../components/RoomBox";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { selectUser } from "../redux/slice/userSlice";
+import { uri } from "../config/config";
 
 const Home: FunctionComponent = () => {
   const [isNewRoom, setIsNewRoom] = useState(false);
@@ -30,7 +31,7 @@ const Home: FunctionComponent = () => {
 
   const [rooms, setRooms] = useState<any>([]);
   useEffect(() => {
-    fetch("https://sab-sunno-backend.herokuapp.com/rooms", {
+    fetch(`${uri}/rooms`, {
       method: "GET",
     })
       .then((response) => response.json())
@@ -54,7 +55,7 @@ const Home: FunctionComponent = () => {
         users: [user],
         createdBy: user,
       };
-      await fetch("https://sab-sunno-backend.herokuapp.com/room", {
+      await fetch(`${uri}/room`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

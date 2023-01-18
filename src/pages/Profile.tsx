@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import UploadImage from "../functions/dataBase/uploadImage";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { User } from "../types.defined";
+import { uri } from "../config/config";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -33,7 +34,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (userId) {
-      fetch(`https://sab-sunno-backend.herokuapp.com/user/${userId}`, {
+      fetch(`${uri}/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +60,7 @@ const Profile = () => {
 
 
   const handleUpdate = async () => {
-    await fetch(`https://sab-sunno-backend.herokuapp.com/user/update/${user?._id}`, {
+    await fetch(`${uri}/user/update/${user?._id}`, {
       method: "PUT",
       body: JSON.stringify({
         username: username,

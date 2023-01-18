@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import UploadImage from "../functions/dataBase/uploadImage";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { userPictureSelector } from "../redux/slice/userSlice";
+import { uri } from "../config/config";
 
 const Authenticate: FunctionComponent = () => {
   const photoURL = useSelector(userPictureSelector);
@@ -152,7 +153,7 @@ const Authenticate: FunctionComponent = () => {
             },
           }}
           onClick={async () => {
-            await fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
+            await fetch(`${uri}/user/${token}`, {
               method: "PUT",
               body: JSON.stringify({
                 username: userName,

@@ -1,7 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
-
-
 import logger from 'redux-logger';
 import rootReducer from './rootReducer';
 import rootSaga from './rootSaga';
@@ -14,7 +12,7 @@ export const store = configureStore({
     // ...getDefaultMiddleware({ thunk: false }),
     ...getDefaultMiddleware(),
     // TODO disable in production
-    logger,
+    // logger,
     sagaMiddleware,
   ],
 });

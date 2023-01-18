@@ -20,6 +20,7 @@ import muteIcon from "../images/mute.png";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { selectUser } from "../redux/slice/userSlice";
 import { RoomUser } from "../types.defined";
+import { uri } from "../config/config";
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
   const user = useSelector(selectUser);
@@ -44,7 +45,7 @@ const Room: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    fetch(`https://sab-sunno-backend.herokuapp.com/room/${roomId}`, {
+    fetch(`${uri}/room/${roomId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

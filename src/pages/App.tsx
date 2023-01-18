@@ -18,6 +18,7 @@ import Login from "./Login";
 import NotFound from "./NotFound";
 import Profile from "./Profile";
 import Room from "./Room";
+import { uri } from "../config/config";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.theme);
@@ -25,7 +26,7 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (token) {
-      fetch(`https://sab-sunno-backend.herokuapp.com/user/${token}`, {
+      fetch(`${uri}/user/${token}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

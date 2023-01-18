@@ -23,6 +23,7 @@ import RegisterUsingEmailAndPassword from "../functions/authProviders/register";
 import GoogleIcon from "../images/google.svg";
 import { setNotification } from "../redux/slice/notificationSlice";
 import { setUser } from "../redux/slice/userSlice";
+import { uri } from "../config/config";
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string | undefined>();
@@ -49,7 +50,7 @@ const Login: FunctionComponent = () => {
         photoURL: data.photoURL,
       };
       console.log(userData);
-      await fetch("https://sab-sunno-backend.herokuapp.com/register", {
+      await fetch(`${uri}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +96,7 @@ const Login: FunctionComponent = () => {
     if (email && password) {
       LoginWithEmail(email, password, async (user) => {
         setIsLoading(true);
-        await fetch("https://sab-sunno-backend.herokuapp.com/user", {
+        await fetch(`${uri}/user`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -152,7 +153,7 @@ const Login: FunctionComponent = () => {
           password: password,
           isAuthenticated: false,
         };
-        await fetch("https://sab-sunno-backend.herokuapp.com/register", {
+        await fetch(`${uri}/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

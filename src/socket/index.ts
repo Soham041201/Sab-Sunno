@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { uri } from "../config/config";
 
 const socketInit = () => {
   const options: any = {
@@ -7,7 +8,7 @@ const socketInit = () => {
     timeout: 10000,
     reconnectionAttempts: "Infinity",
   };
-  return io("https://sab-sunno-backend.herokuapp.com", options);
+  return io(`${uri}`, options);
 };
 
 export default socketInit;

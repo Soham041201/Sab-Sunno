@@ -15,6 +15,7 @@ import { User } from "../types.defined";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { setNotification } from "../redux/slice/notificationSlice";
+import { uri } from "../config/config";
 
 interface RoomBoxProps {
   roomId: string;
@@ -41,7 +42,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
   };
 
   const handleDelete = async () => {
-    await fetch(`https://sab-sunno-backend.herokuapp.com/room/${roomId}`, {
+    await fetch(`${uri}/room/${roomId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
