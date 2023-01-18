@@ -1,20 +1,14 @@
-import NightlightIcon from "@mui/icons-material/Nightlight";
-import WbSunnyIcon from "@mui/icons-material/WbSunny";
-import { AppBar, Box, Button, IconButton, Typography } from "@mui/material";
+import { AppBar, Box, Button, Typography } from "@mui/material";
 import { FunctionComponent } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setTheme } from "../redux/slice/themeSlice";
 import { selectUser } from "../redux/slice/userSlice";
-import { RootState } from "../redux/store";
-import { Theme } from "../types.defined";
 import MenuTab from "./MenuTab";
 const Menubar: FunctionComponent = () => {
   const user = useSelector(selectUser);
 
-  const dispatch = useDispatch();
+
   const isMobile = window.innerWidth < 600;
-  const theme = useSelector((state: RootState) => state?.theme.theme);
   const navigate = useNavigate();
 
   return (
