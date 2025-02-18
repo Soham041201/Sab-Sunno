@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useRef } from "react";
-import socketInit from "../socket";
-import { User, RoomUser } from "../types.defined";
-import { useStateWithCallback } from "./useStateWithCallback";
+import { useCallback, useEffect, useRef } from 'react';
+import socketInit from '../socket';
+import { User, RoomUser } from '../types.defined';
+import { useStateWithCallback } from './useStateWithCallback';
 
 export const useWebRTC = (roomId: any, user: User) => {
-  
   const [clients, setClients] = useStateWithCallback([]);
   const audioElement = useRef<any>({});
   const connections = useRef<any>({});
@@ -50,17 +49,177 @@ export const useWebRTC = (roomId: any, user: User) => {
         }
       });
 
-      socket.current.on("remove-peer", handleRemovePeer);
-      socket.current.on("add-peer", handleNewPeer);
-      socket.current.on("session-description", handleRemoteSDP);
-      socket.current.on("ice-candidate", handleIceCandidate);
-      socket.current.on("mute", ({ userId }: { userId: string }) => {
+      socket.current.on('remove-peer', handleRemovePeer);
+      socket.current.on('add-peer', handleNewPeer);
+      socket.current.on('session-description', handleRemoteSDP);
+
+      socket.current.on(
+        'open-ai-answer',
+        async ({ peerId, sessionDescription: answer }: any) => {
+          if (connections.current['open-ai']) {
+            await connections.current['open-ai'].setRemoteDescription({
+              type: 'answer',
+              sdp: answer,
+            });
+            connections.current['open-ai'].onconnectionstatechange = () => {
+              // console.log(
+              //   'PeerConnection state:',
+              //   connections.current[peerId].connectionState
+              // );
+            };
+
+            connections.current['open-ai'].onicecandidate = async (
+              event: any
+            ) => {
+              if (event.candidate !== null) {
+                await socket.current.emit('relay-ice', {
+                  peerId,
+                  icecandidate: event.candidate,
+                });
+              }
+            };
+
+            connections.current['open-ai'].onsignalingstatechange = () => {
+              // console.log(
+              //   'Signaling state:',
+              //   connections.current['open-ai'].signalingState
+              // );
+            };
+            connections.current['open-ai'].oniceconnectionstatechange = () => {
+              // console.log(
+              //   'ICE connection state:',
+              //   connections.current['open-ai'].iceConnectionState
+              // );
+            };
+            // setInterval(() => {
+            //   console.log(
+            //     'PeerConnection state:',
+            //     connections.current['open-ai'].connectionState
+            //   );
+            // }, 1000);
+          }
+        }
+      );
+
+      socket.current.on('open-ai-ice', ({ peerId, icecandidate }: any) => {
+        if (connections.current['open-ai'])
+          handleIceCandidate({ peerId, icecandidate });
+      }); // Emit a Socket.IO event
+      // socket.current.on('openai-session-key', async ({ token }: any) => {
+
+      // add make an socket response along with the local description. use the response to connect to the server.
+      connections.current['open-ai'] = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: [
+              'stun:stun1.l.google.com:19302',
+              'stun:stun2.l.google.com:19302',
+            ],
+          },
+        ],
+        iceCandidatePoolSize: 10,
+      });
+      await localMediaStream.current
+        .getTracks()
+        .forEach((track: AudioBuffer) => {
+          connections.current['open-ai'].addTrack(
+            track,
+            localMediaStream.current
+          );
+        });
+
+      const dc = await connections.current['open-ai'].createDataChannel(
+        'oai-events',
+        {
+          ordered: true,
+          maxRetransmits: 30,
+        }
+      );
+
+      // Listen for server-sent events on the data channel - event data
+      // will need to be parsed from a JSON string
+      dc.addEventListener('message', (e: any) => {
+        // const realtimeEvent = JSON.parse(e.data);
+        console.log(e.data);
+      });
+
+      dc.addEventListener('error', (err: any) => {
+        console.error('!!! Data Channel Error:', err);
+      });
+
+      const audioEl = document.createElement('audio');
+      audioEl.autoplay = true;
+      connections.current['open-ai'].ontrack = (e: any) =>
+        (audioEl.srcObject = e.streams[0]);
+
+      // Send client events by serializing a valid client event to
+      // JSON, and sending it over the data channel
+      const responseCreate = {
+        type: 'response.create',
+        response: {
+          modalities: ['text', 'audio'],
+          instructions: 'Write a haiku about code',
+        },
+      };
+      dc.onopen = () => {
+        console.log('DataChannel is open.');
+        dc.send(JSON.stringify(responseCreate));
+      };
+
+      dc.onerror = (error: any) => {
+        console.error('DataChannel error:', error);
+      };
+
+      dc.onclose = () => {
+        console.log('DataChannel is closed.');
+      };
+
+      connections.current['open-ai'].ondatachannel = (event: any) => {
+        const receivedChannel = event.channel;
+
+        receivedChannel.onopen = () => {
+          console.log('Data channel is open!');
+        };
+
+        receivedChannel.onmessage = (event: any) => {
+          console.log('Received message:', event.data);
+        };
+
+        receivedChannel.onclose = () => {
+          console.log('Data channel is closed!');
+        };
+      };
+
+      const offer = await connections.current['open-ai'].createOffer({
+        offerToReceiveAudio: true,
+      });
+      await connections.current['open-ai'].setLocalDescription(offer);
+
+      // // Create a data channel from a peer connection
+      // const audioEl = document.createElement("audio");
+      // audioEl.autoplay = true;
+      // connections.current['open-ai'].ontrack = (e:any) => {
+      //   console.log({e});
+
+      //   audioEl.srcObject = e.streams[0]
+      // };
+
+      socket.current.emit('open-ai-offer', {
+        peerId: 'open-ai',
+        sessionDescription: offer,
+        // token,
+      });
+      // }
+      // );
+
+      socket.current.on('ice-candidate', handleIceCandidate);
+      socket.current.on('mute', ({ userId }: { userId: string }) => {
         setMute(true, userId);
       });
-      socket.current.on("un-mute", ({ userId }: { userId: string }) => {
+      socket.current.on('un-mute', ({ userId }: { userId: string }) => {
         setMute(false, userId);
       });
-      socket.current.emit("join", { roomId, user });
+      socket.current.emit('join', { roomId, user });
     };
 
     initChat();
@@ -75,11 +234,11 @@ export const useWebRTC = (roomId: any, user: User) => {
         delete audioElement?.current[peerId];
       }
 
-      socket.current.emit("leave", { roomId, user });
-      socket.current.off("session-description");
-      socket.current.off("add-peer");
-      socket.current.off("ice-candidate");
-      socket.current.off("remove-peer");
+      socket.current.emit('leave', { roomId, user });
+      socket.current.off('session-description');
+      socket.current.off('add-peer');
+      socket.current.off('ice-candidate');
+      socket.current.off('remove-peer');
     };
   }, []);
 
@@ -106,13 +265,13 @@ export const useWebRTC = (roomId: any, user: User) => {
       new RTCSessionDescription(remoteSessionDescription)
     );
 
-    if (remoteSessionDescription.type === "offer") {
+    if (remoteSessionDescription.type === 'offer') {
       const connection = connections.current[peerId];
       const answer = await connection.createAnswer();
 
       await connection.setLocalDescription(answer);
 
-      socket.current.emit("relay-sdp", {
+      socket.current.emit('relay-sdp', {
         peerId,
         sessionDescription: answer,
       });
@@ -133,8 +292,8 @@ export const useWebRTC = (roomId: any, user: User) => {
       iceServers: [
         {
           urls: [
-            "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302",
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
           ],
         },
       ],
@@ -142,7 +301,7 @@ export const useWebRTC = (roomId: any, user: User) => {
     });
     connections.current[peerId].onicecandidate = async (event: any) => {
       if (event.candidate !== null) {
-        await socket.current.emit("relay-ice", {
+        await socket.current.emit('relay-ice', {
           peerId,
           icecandidate: event.candidate,
         });
@@ -175,7 +334,7 @@ export const useWebRTC = (roomId: any, user: User) => {
     if (createOffer) {
       const offer = await connections.current[peerId].createOffer();
       await connections.current[peerId].setLocalDescription(offer);
-      await socket.current.emit("relay-sdp", {
+      await socket.current.emit('relay-sdp', {
         peerId,
         sessionDescription: offer,
       });
@@ -218,9 +377,9 @@ export const useWebRTC = (roomId: any, user: User) => {
       if (localMediaStream.current) {
         localMediaStream.current.getTracks()[0].enabled = !isMuted;
         if (isMuted) {
-          socket.current.emit("mute", { userId, isMuted, roomId });
+          socket.current.emit('mute', { userId, isMuted, roomId });
         } else {
-          socket.current.emit("un-mute", { userId, isMuted, roomId });
+          socket.current.emit('un-mute', { userId, isMuted, roomId });
         }
         settled = true;
       }
