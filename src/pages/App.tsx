@@ -1,35 +1,38 @@
-import { ThemeProvider } from "@mui/material";
-import { CssBaseline } from "@mui/material/";
-import Cookies from "js-cookie";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomeRoute from "../components/HomeRoute";
-import Menubar from "../components/Menubar";
-import Notification from "../components/Notification";
-import ProtectedRoute from "../components/ProtectedRoute";
-import { setUser } from "../redux/slice/userSlice";
-import { RootState } from "../redux/store";
-import { darkTheme, lightTheme } from "../style/theme";
-import Authenticate from "./Authenticate";
-import GetStarted from "./GetStarted";
-import Home from "./Home";
-import Login from "./Login";
-import NotFound from "./NotFound";
-import Profile from "./Profile";
-import Room from "./Room";
-import { uri } from "../config/config";
+import { ThemeProvider } from '@mui/material';
+import { CssBaseline } from '@mui/material/';
+import Cookies from 'js-cookie';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import HomeRoute from '../components/HomeRoute';
+import Menubar from '../components/Menubar';
+import Notification from '../components/Notification';
+import ProtectedRoute from '../components/ProtectedRoute';
+import { selectUser, setUser } from '../redux/slice/userSlice';
+import { RootState } from '../redux/store';
+import { darkTheme, lightTheme } from '../style/theme';
+import Authenticate from './Authenticate';
+import GetStarted from './GetStarted';
+import Home from './Home';
+import Login from './Login';
+import NotFound from './NotFound';
+import Profile from './Profile';
+import Room from './Room';
+import { uri } from '../config/config';
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.theme);
-  const token = Cookies.get("user-token");
+  const token = Cookies.get('user-token');
   const dispatch = useDispatch();
+
+  const user = useSelector(selectUser);
+
   useEffect(() => {
     if (token) {
       fetch(`${uri}/user/${token}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -39,21 +42,21 @@ function App() {
           }
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.error('Error:', error);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <CssBaseline />
       <Notification />
       <BrowserRouter>
-        <Menubar />
+        {user && <Menubar />}
         <Routes>
           <Route
-            path="/"
+            path='/'
             element={
               <HomeRoute>
                 <GetStarted />
@@ -61,16 +64,16 @@ function App() {
             }
           />
           <Route
-            path="/authenticate"
+            path='/authenticate'
             element={
               <HomeRoute>
                 <Authenticate />
               </HomeRoute>
             }
           />
-          <Route path="/login" element={<Login />} />
+          <Route path='/login' element={<Login />} />
           <Route
-            path="/home"
+            path='/home'
             element={
               <ProtectedRoute>
                 <Home />
@@ -78,7 +81,7 @@ function App() {
             }
           />
           <Route
-            path="/room/:roomId"
+            path='/room/:roomId'
             element={
               <ProtectedRoute>
                 <Room />
@@ -86,7 +89,7 @@ function App() {
             }
           />
           <Route
-            path="/profile/:userId"
+            path='/profile/:userId'
             element={
               <ProtectedRoute>
                 <Profile />
@@ -94,7 +97,7 @@ function App() {
             }
           />
 
-          <Route path="*" element={<NotFound />} />
+          <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

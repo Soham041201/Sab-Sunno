@@ -1,4 +1,4 @@
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import {
   Avatar,
   Box,
@@ -7,37 +7,41 @@ import {
   Divider,
   TextField,
   Typography,
-} from "@mui/material";
-import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
-import UploadImage from "../functions/dataBase/uploadImage";
-import { setNotification } from "../redux/slice/notificationSlice";
-import { User } from "../types.defined";
-import { uri } from "../config/config";
+  useTheme,
+} from '@mui/material';
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import UploadImage from '../functions/dataBase/uploadImage';
+import { setNotification } from '../redux/slice/notificationSlice';
+import { User } from '../types.defined';
+import { uri } from '../config/config';
+import NeoPOPButton from '../components/common/NeoPOPButton';
 
 const Profile = () => {
   const { userId } = useParams();
-  const userToken = Cookies.get("user-token");
+  const userToken = Cookies.get('user-token');
   const [user, setUser] = useState<User>();
   const isMobile = window.innerWidth < 600;
-  const [url, setUrl] = useState<string | undefined>("");
-  const [fname, setFname] = useState<string | undefined>("");
-  const [lname, setLname] = useState<string | undefined>("");
-  const [username, setUsername] = useState<string | undefined>("");
-  const [about, setAbout] = useState<string | undefined>("");
+  const [url, setUrl] = useState<string | undefined>('');
+  const [fname, setFname] = useState<string | undefined>('');
+  const [lname, setLname] = useState<string | undefined>('');
+  const [username, setUsername] = useState<string | undefined>('');
+  const [about, setAbout] = useState<string | undefined>('');
   const isSelf = userId === userToken;
 
   console.log(isSelf);
 
   const dispatch = useDispatch();
+  const theme = useTheme();
+
   useEffect(() => {
     if (userId) {
       fetch(`${uri}/user/${userId}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -52,16 +56,15 @@ const Profile = () => {
           }
         })
         .catch((error) => {
-          console.error("Error:", error);
+          console.error('Error:', error);
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   const handleUpdate = async () => {
     await fetch(`${uri}/user/update/${user?._id}`, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify({
         username: username,
         photoURL: url,
@@ -71,7 +74,7 @@ const Profile = () => {
         password: user?.password,
       }),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     })
       .then((response) => response.json())
@@ -80,207 +83,356 @@ const Profile = () => {
           console.log(data);
           dispatch(
             setNotification({
-              message: "Your profile has been updated",
-              type: "success",
+              message: 'Your profile has been updated',
+              type: 'success',
             })
           );
         }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error('Error:', error);
       });
-  }
+  };
 
   return (
     <Container
+      maxWidth='lg'
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        py: 4,
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #fff 0%, #FFF5E9 100%)',
       }}
     >
       {user && (
         <Box
           sx={{
-            m: 1,
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            justifyContent: "space-between",
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: `
+              4px 4px 0 rgba(0, 0, 0, 0.1),
+              8px 8px 20px rgba(255, 132, 19, 0.15)
+            `,
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            p: { xs: 2, md: 4 },
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: 4,
           }}
         >
-          <Box>
-            <Button
-              variant={"text"}
-              component="label"
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: isMobile ? '100%' : '300px',
+            }}
+          >
+            <Box
               sx={{
-                "&:hover": {
-                  backgroundColor: "transparent",
+                position: 'relative',
+                mb: 3,
+                '&:hover .upload-overlay': {
+                  opacity: 1,
                 },
               }}
-              disableElevation
-              disableFocusRipple
-              disableTouchRipple
-              disabled={!isSelf}
             >
               <Avatar
                 sx={{
-                  m: 2,
-                  width: "200px",
-                  height: "200px",
-                  mx: "auto",
+                  width: 200,
+                  height: 200,
+                  border: '4px solid',
+                  borderColor: 'rgba(255, 132, 19, 0.2)',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
                 }}
-                src={url ? url : user.photoURL}
+                src={url || user.photoURL}
               />
-              <AddPhotoAlternateIcon
-                sx={{
-                  fontSize: 48,
-                  display: "flex",
-                  position: "absolute",
-                  color: "gray",
-                  opacity: 0.6,
-                }}
-              />
-              <input
-                type="file"
-                hidden
-                onChange={async (e) =>
-                  await UploadImage(e, (url) => {
-                    setUrl(url);
-                  })
-                }
-                disabled={!isSelf}
-              />
-            </Button>
+              {isSelf && (
+                <Box
+                  className='upload-overlay'
+                  component='label'
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease',
+                  }}
+                >
+                  <AddPhotoAlternateIcon
+                    sx={{
+                      fontSize: 48,
+                      color: '#ffffff',
+                    }}
+                  />
+                  <input
+                    type='file'
+                    hidden
+                    onChange={async (e) =>
+                      await UploadImage(e, (url) => {
+                        setUrl(url);
+                      })
+                    }
+                    disabled={!isSelf}
+                  />
+                </Box>
+              )}
+            </Box>
+
             <TextField
-              defaultValue={user.username}
-              variant={"standard"}
+              value={username}
+              variant='outlined'
               disabled={!isSelf}
-              size={"medium"}
               sx={{
-                m: 1,
-                width: "200px",
+                width: '100%',
+                maxWidth: '280px',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 0,
+                  transition: 'all 0.2s ease',
+                  backgroundColor: '#ffffff',
+                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                  '&.Mui-focused': {
+                    transform: 'translate(-4px, -4px)',
+                    boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
+                    borderColor: theme.palette.primary.main,
+                  },
+                  '&:hover': {
+                    borderColor: 'rgba(0, 0, 0, 0.24)',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Raleway',
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
+                },
               }}
-              label={"Username"}
+              label='Username'
               onChange={(e) => setUsername(e.target.value)}
             />
           </Box>
 
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <Box>
+          <Box sx={{ flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+                mb: 4,
+              }}
+            >
               <TextField
-                defaultValue={user.firstName}
-                variant={"standard"}
+                value={fname}
+                variant='outlined'
                 disabled={!isSelf}
-                size={"medium"}
                 sx={{
-                  m: 1,
-                  width: "200px",
+                  flex: 1,
+                  minWidth: '200px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 0,
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#ffffff',
+                    borderColor: 'rgba(0, 0, 0, 0.12)',
+                    '&.Mui-focused': {
+                      transform: 'translate(-4px, -4px)',
+                      boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
+                      borderColor: theme.palette.primary.main,
+                    },
+                    '&:hover': {
+                      borderColor: 'rgba(0, 0, 0, 0.24)',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontFamily: 'Raleway',
+                    '&.Mui-focused': {
+                      color: theme.palette.primary.main,
+                    },
+                  },
                 }}
-                label={"Firstname"}
+                label='First Name'
                 onChange={(e) => setFname(e.target.value)}
               />
               <TextField
-                defaultValue={user.lastName}
-                variant={"standard"}
+                value={lname}
+                variant='outlined'
                 disabled={!isSelf}
-                size={"medium"}
                 sx={{
-                  m: 1,
-                  width: "200px",
+                  flex: 1,
+                  minWidth: '200px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 0,
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#ffffff',
+                    borderColor: 'rgba(0, 0, 0, 0.12)',
+                    '&.Mui-focused': {
+                      transform: 'translate(-4px, -4px)',
+                      boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
+                      borderColor: theme.palette.primary.main,
+                    },
+                    '&:hover': {
+                      borderColor: 'rgba(0, 0, 0, 0.24)',
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontFamily: 'Raleway',
+                    '&.Mui-focused': {
+                      color: theme.palette.primary.main,
+                    },
+                  },
                 }}
-                label={"Lastname"}
+                label='Last Name'
                 onChange={(e) => setLname(e.target.value)}
               />
             </Box>
 
             <Typography
-              variant={"h3"}
               sx={{
-                m: 1,
+                fontFamily: 'Raleway',
+                fontSize: '1.1rem',
+                color: 'rgba(0, 0, 0, 0.6)',
+                mb: 4,
               }}
             >
               {user.email}
             </Typography>
+
             <Box
               sx={{
-                display: "flex",
-                flexDirection: isMobile ? "column" : "row",
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 4,
+                mb: 4,
               }}
             >
-              <Box sx={{ m: 2 }}>
-                <Typography variant={"h2"}>Followers</Typography>
-                <Divider
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: '200px',
+                  p: 3,
+                  backgroundColor: 'rgba(255, 132, 19, 0.04)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 132, 19, 0.1)',
+                }}
+              >
+                <Typography
+                  variant='h6'
                   sx={{
-                    width: "200px",
+                    fontFamily: 'Raleway',
+                    fontWeight: 600,
+                    color: '#2C3E50',
+                    mb: 1,
                   }}
-                />
-                <Typography variant={"h2"}>0</Typography>
+                >
+                  Followers
+                </Typography>
+                <Typography
+                  variant='h4'
+                  sx={{
+                    fontFamily: 'Raleway',
+                    fontWeight: 800,
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  0
+                </Typography>
               </Box>
-              <Box sx={{ m: 2 }}>
-                <Typography variant={"h2"}>Following</Typography>
-                <Divider
+
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: '200px',
+                  p: 3,
+                  backgroundColor: 'rgba(255, 132, 19, 0.04)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 132, 19, 0.1)',
+                }}
+              >
+                <Typography
+                  variant='h6'
                   sx={{
-                    width: "200px",
+                    fontFamily: 'Raleway',
+                    fontWeight: 600,
+                    color: '#2C3E50',
+                    mb: 1,
                   }}
-                />
-                <Typography variant={"h2"}>0</Typography>
+                >
+                  Following
+                </Typography>
+                <Typography
+                  variant='h4'
+                  sx={{
+                    fontFamily: 'Raleway',
+                    fontWeight: 800,
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  0
+                </Typography>
               </Box>
             </Box>
-            <Typography variant={"h2"} sx={{ my: 1 }}>
+
+            <Typography
+              variant='h6'
+              sx={{
+                fontFamily: 'Raleway',
+                fontWeight: 600,
+                color: '#2C3E50',
+                mb: 2,
+              }}
+            >
               About
             </Typography>
-            <Divider
-              sx={{
-                width: "200px",
-              }}
-            />
+
             <TextField
-              defaultValue={user.about}
-              variant={"standard"}
+              value={about}
+              variant='outlined'
               disabled={!isSelf}
-              size={"medium"}
+              multiline
+              rows={4}
+              fullWidth
               sx={{
-                m: 1,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 0,
+                  transition: 'all 0.2s ease',
+                  backgroundColor: '#ffffff',
+                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                  '&.Mui-focused': {
+                    transform: 'translate(-4px, -4px)',
+                    boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
+                    borderColor: theme.palette.primary.main,
+                  },
+                  '&:hover': {
+                    borderColor: 'rgba(0, 0, 0, 0.24)',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Raleway',
+                  '&.Mui-focused': {
+                    color: theme.palette.primary.main,
+                  },
+                },
               }}
+              placeholder='Tell us about yourself...'
               onChange={(e) => setAbout(e.target.value)}
-              label={"About"}
             />
           </Box>
         </Box>
       )}
-      <Button
-        variant="contained"
-        disableElevation
-        sx={{
-          backgroundColor: "white",
-          my: 2,
-          width: 200,
-          mx: "auto",
-          borderRadius: "60px",
-          "&:hover": {
-            backgroundColor: "rgba(248, 248, 248, 0.8)",
-          },
-        }}
-        onClick={handleUpdate}
-        disabled={!isSelf}
-      >
-        <Typography
-          sx={{
-            color: "black",
-            textTransform: "none",
-            fontFamily: "Raleway",
-          }}
-        >
-          Save
-        </Typography>
-      </Button>
+
+      {isSelf && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <NeoPOPButton onClick={handleUpdate} size='large'>
+            Save Changes
+          </NeoPOPButton>
+        </Box>
+      )}
     </Container>
   );
 };

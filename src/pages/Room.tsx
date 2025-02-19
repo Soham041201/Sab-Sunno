@@ -1,26 +1,29 @@
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import ShareIcon from '@mui/icons-material/Share';
 import {
   Avatar,
   Badge,
   Box,
-  Button,
   Container,
   Grid,
   IconButton,
   Skeleton,
   Typography,
-} from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { useWebRTC } from "../hooks/useWebRTC";
-import muteIcon from "../images/mute.png";
-import { setNotification } from "../redux/slice/notificationSlice";
-import { selectUser } from "../redux/slice/userSlice";
-import { RoomUser } from "../types.defined";
-import { uri } from "../config/config";
+  useTheme,
+} from '@mui/material';
+import { FunctionComponent, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useWebRTC } from '../hooks/useWebRTC';
+import muteIcon from '../images/mute.png';
+import { setNotification } from '../redux/slice/notificationSlice';
+import { selectUser } from '../redux/slice/userSlice';
+import { RoomUser } from '../types.defined';
+import { uri } from '../config/config';
+import NeoPOPButton from '../components/common/NeoPOPButton';
+
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
   const user = useSelector(selectUser);
@@ -29,26 +32,27 @@ const Room: FunctionComponent = () => {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const copy = () => {
-    const el = document.createElement("input");
+    const el = document.createElement('input');
     el.value =
-      "Join me and my friends having a amazing conversation at " +
+      'Join me and my friends having a amazing conversation at ' +
       window.location.href;
     document.body.appendChild(el);
     el.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     document.body.removeChild(el);
     dispatch(
-      setNotification({ type: "success", message: "Link copied to clipboard" })
+      setNotification({ type: 'success', message: 'Link copied to clipboard' })
     );
   };
 
   useEffect(() => {
     fetch(`${uri}/room/${roomId}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     })
       .then((response) => response.json())
@@ -58,210 +62,295 @@ const Room: FunctionComponent = () => {
         }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error('Error:', error);
       });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     handleMute(user._id, isMuted, roomId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMuted]);
+  }, [isMuted, user._id, roomId, handleMute]);
 
   return (
-    <Container>
+    <Container
+      maxWidth='xl'
+      sx={{
+        minHeight: '100vh',
+        py: 4,
+        px: { xs: 2, md: 4 },
+        backgroundColor: '#fafafa',
+      }}
+    >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 4,
         }}
       >
-        <Button
-          startIcon={
-            <ArrowBackIcon
-              sx={{
-                color: "white",
-              }}
-            />
-          }
-          sx={{
-            mx: 5,
-            my: 1,
-          }}
-          onClick={() => navigate("/home")}
+        <NeoPOPButton
+          variant='secondary'
+          icon={<ArrowBackIcon />}
+          onClick={() => navigate('/home')}
+          size='small'
         >
-          <Typography
-            variant={"h3"}
-            sx={{
-              textTransform: "none",
-              textDecoration: "underline",
-              textUnderlineOffset: 4,
-              textDecorationColor: "#b388ff",
-              textDecorationThickness: "2px",
-            }}
-          >
-            back to rooms
-          </Typography>
-        </Button>
-        <Button
-          variant={"contained"}
-          disableElevation
-          sx={{
-            backgroundColor: "#b388ff",
-            borderRadius: "15px",
-            textTransform: "none",
-            my: 1,
-          }}
-          onClick={copy}
-        >
-          <Typography variant={"h3"}>Invite a friend</Typography>
-        </Button>
+          Back to Rooms
+        </NeoPOPButton>
+
+        <NeoPOPButton icon={<ShareIcon />} onClick={copy} size='small'>
+          Invite Friends
+        </NeoPOPButton>
       </Box>
 
       <Container
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          maxWidth: '1200px',
         }}
       >
         <Box
           sx={{
-            textAlign: "center",
-            mb: 1,
+            mb: 4,
+            position: 'relative',
+            maxWidth: '800px',
           }}
         >
-          <Typography variant={"h1"}>
-            {room.roomName ? (
-              room.roomName
-            ) : (
-              <Skeleton sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
-            )}
-          </Typography>
+          <Box
+            sx={{
+              position: 'relative',
+              mb: 3,
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: 0,
+                width: 80,
+                height: 4,
+                backgroundColor: theme.palette.primary.main,
+                borderRadius: '2px',
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: '2rem', md: '2.5rem' },
+                fontFamily: 'Raleway',
+                fontWeight: 800,
+                color: '#000000',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+              }}
+            >
+              {room.roomName ? (
+                room.roomName
+              ) : (
+                <Skeleton
+                  width='60%'
+                  sx={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    borderRadius: '2px',
+                  }}
+                />
+              )}
+            </Typography>
+          </Box>
 
-          <Typography variant={"h3"}>
+          <Typography
+            sx={{
+              fontSize: '1.1rem',
+              color: 'rgba(0, 0, 0, 0.7)',
+              fontFamily: 'Raleway',
+              fontWeight: 500,
+              maxWidth: '600px',
+              lineHeight: 1.5,
+              pl: 0.5,
+              borderLeft: (theme) => `3px solid ${theme.palette.primary.main}`,
+              opacity: 0.85,
+            }}
+          >
             {room.roomDescription ? (
               room.roomDescription
             ) : (
-              <Skeleton sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+              <Skeleton
+                width='100%'
+                sx={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                  borderRadius: '2px',
+                }}
+              />
             )}
           </Typography>
         </Box>
 
         <Box
-          component={"div"}
           sx={{
-            mx: { sm: 3, md: 5, lg: 10 },
-            p: 2,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            borderRadius: "20px",
-            display: "flex",
-            height: { sx: "80vh", sm: "80vh", md: 360, lg: 345 },
-            overflow: "auto",
-            "&::-webkit-scrollbar": {
-              width: "0.1em",
-              backgroundColor: "white",
-              color: "black",
+            backgroundColor: '#ffffff',
+            p: 4,
+            borderRadius: '2px',
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            boxShadow: `
+              4px 4px 0 rgba(0, 0, 0, 0.2),
+              8px 8px 0 rgba(255, 132, 19, 0.2)
+            `,
+            height: { xs: 'auto', md: '400px' },
+            overflow: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(0, 0, 0, 0.05)',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: theme.palette.primary.main,
+              borderRadius: '2px',
             },
           }}
         >
-          <Grid container spacing={1}>
-            {clients &&
-              clients?.map((client: RoomUser) => {
-                return (
-                  <Grid item xs={4} sm={4} md={2} key={clients.indexOf(client)}>
+          <Grid container spacing={3}>
+            {clients?.map((client: RoomUser) => (
+              <Grid item xs={6} sm={4} md={3} key={client._id}>
+                <Box
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                  onClick={() => navigate(`/profile/${client._id}`)}
+                >
+                  <audio
+                    autoPlay
+                    ref={(instance) => {
+                      provideRef(instance, client._id);
+                    }}
+                  />
+                  <Badge
+                    overlap='circular'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    badgeContent={
+                      <Avatar
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          backgroundColor: 'transparent',
+                        }}
+                        src={muteIcon}
+                        variant='circular'
+                      />
+                    }
+                    invisible={!client.isMuted}
+                  >
+                    <Avatar
+                      src={client?.photoURL}
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        border: '2px solid #ffffff',
+                        boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.12)',
+                      }}
+                    />
+                  </Badge>
+
+                  <Typography
+                    sx={{
+                      mt: 2,
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      color: 'rgba(0, 0, 0, 0.85)',
+                    }}
+                  >
+                    {client.username}
+                  </Typography>
+
+                  {room?.createdBy?._id === client?._id && (
                     <Box
                       sx={{
-                        p: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                      onClick={() => {
-                        navigate(`/profile/${client._id}`);
+                        mt: 1,
+                        px: 2,
+                        py: 0.5,
+                        backgroundColor: theme.palette.primary.main,
+                        borderRadius: '2px',
                       }}
                     >
-                      <audio
-                        autoPlay
-                        ref={(instance) => {
-                          provideRef(instance, client._id);
+                      <Typography
+                        sx={{
+                          fontSize: '0.75rem',
+                          color: '#ffffff',
+                          fontWeight: 600,
                         }}
-                      />
-                      <Badge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        badgeContent={
-                          <Avatar
-                            sx={{
-                              width: 24,
-                              height: 24,
-                              backgroundColor: "transparent",
-                            }}
-                            src={muteIcon}
-                            variant="circular"
-                          />
-                        }
-                        invisible={!client.isMuted}
                       >
-                        <Avatar
-                          src={client?.photoURL}
-                          sx={{ width: 48, height: 48 }}
-                        />
-                      </Badge>
-
-                      <Typography variant={"body2"} sx={{ mt: 1 }}>
-                        {client.username}
+                        Host
                       </Typography>
-                      {room?.createdBy?._id === client?._id && (
-                        <Box
-                          sx={{
-                            backgroundColor: "#b388ff",
-                            width: "40px",
-                            borderRadius: "20px",
-                          }}
-                        >
-                          <Typography textAlign={"center"} variant={"body2"}>
-                            host
-                          </Typography>
-                        </Box>
-                      )}
                     </Box>
-                  </Grid>
-                );
-              })}
+                  )}
+                </Box>
+              </Grid>
+            ))}
           </Grid>
         </Box>
+
         <Box
           sx={{
-            bottom: 0,
-            position: "center",
-            mx: "auto",
-            mt: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            mt: 4,
           }}
         >
           <IconButton
-            sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              bottom: 0,
-            }}
             onClick={() => setIsMuted(!isMuted)}
+            sx={{
+              p: 2,
+              backgroundColor: isMuted
+                ? theme.palette.error.main
+                : theme.palette.primary.main,
+              borderRadius: '2px',
+              border: '1px solid rgba(0, 0, 0, 0.12)',
+              boxShadow: `
+                2px 2px 0 rgba(0, 0, 0, 0.2),
+                4px 4px 0 ${
+                  isMuted ? 'rgba(211, 47, 47, 0.3)' : 'rgba(255, 132, 19, 0.3)'
+                }
+              `,
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: isMuted ? theme.palette.error.dark : '#FF7F50',
+                transform: 'translate(-2px, -2px)',
+                boxShadow: `
+                  4px 4px 0 rgba(0, 0, 0, 0.2),
+                  6px 6px 0 ${
+                    isMuted
+                      ? 'rgba(211, 47, 47, 0.3)'
+                      : 'rgba(255, 127, 80, 0.3)'
+                  }
+                `,
+              },
+              '&:active': {
+                transform: 'translate(2px, 2px)',
+                boxShadow: `
+                  1px 1px 0 rgba(0, 0, 0, 0.2),
+                  2px 2px 0 ${
+                    isMuted
+                      ? 'rgba(211, 47, 47, 0.3)'
+                      : 'rgba(255, 132, 19, 0.3)'
+                  }
+                `,
+              },
+            }}
           >
             {!isMuted ? (
-              <MicIcon
-                sx={{
-                  fontSize: "32px",
-                }}
-              />
+              <MicIcon sx={{ fontSize: 28, color: '#ffffff' }} />
             ) : (
-              <MicOffIcon
-                sx={{
-                  fontSize: "32px",
-                }}
-              />
+              <MicOffIcon sx={{ fontSize: 28, color: '#ffffff' }} />
             )}
           </IconButton>
         </Box>

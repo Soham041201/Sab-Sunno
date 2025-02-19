@@ -1,29 +1,33 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
   Box,
   Button,
   Container,
+  Divider,
   IconButton,
   InputAdornment,
   InputLabel,
+  Modal,
   OutlinedInput,
   TextField,
   Typography,
-} from "@mui/material";
-import Cookies from "js-cookie";
-import { FunctionComponent, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import CustomLoader from "../components/Loader";
-import Title from "../components/Title";
-import GoogleSignIn from "../functions/authProviders/googleSign";
-import { LoginWithEmail } from "../functions/authProviders/login";
-import RegisterUsingEmailAndPassword from "../functions/authProviders/register";
-import GoogleIcon from "../images/google.svg";
-import { setNotification } from "../redux/slice/notificationSlice";
-import { setUser } from "../redux/slice/userSlice";
-import { uri } from "../config/config";
+  useTheme,
+} from '@mui/material';
+import Cookies from 'js-cookie';
+import { FunctionComponent, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import CustomLoader from '../components/Loader';
+import Title from '../components/Title';
+import GoogleSignIn from '../functions/authProviders/googleSign';
+import { LoginWithEmail } from '../functions/authProviders/login';
+import RegisterUsingEmailAndPassword from '../functions/authProviders/register';
+import GoogleIcon from '../images/google.svg';
+import { setNotification } from '../redux/slice/notificationSlice';
+import { setUser } from '../redux/slice/userSlice';
+import { uri } from '../config/config';
+import NeoPOPButton from '../components/common/NeoPOPButton';
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string | undefined>();
@@ -32,28 +36,29 @@ const Login: FunctionComponent = () => {
   const [lastName, setLastName] = useState<string | undefined>();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState<boolean>(false);
-
+  const theme = useTheme();
   const handleGoogleSignIn = () => {
     setIsLoading(true);
     GoogleSignIn(async (data) => {
       const userData: any = {
         email: data.email,
-        firstName: data.displayName.split(" ")[0],
-        lastName: data.displayName.split(" ")[1],
+        firstName: data.displayName.split(' ')[0],
+        lastName: data.displayName.split(' ')[1],
         password: `${
-          data.displayName.split(" ")[0] + data.displayName.split(" ")[1]
+          data.displayName.split(' ')[0] + data.displayName.split(' ')[1]
         }`,
         photoURL: data.photoURL,
       };
       console.log(userData);
       await fetch(`${uri}/register`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
       })
@@ -63,31 +68,31 @@ const Login: FunctionComponent = () => {
           dispatch(setUser({ user: data.user }));
           dispatch(
             setNotification({
-              message: "Logged in Successfully",
-              type: "success",
+              message: 'Logged in Successfully',
+              type: 'success',
             })
           );
 
-          Cookies.remove("user-token");
-          Cookies.remove("isAuthenticated");
+          Cookies.remove('user-token');
+          Cookies.remove('isAuthenticated');
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + 1 * 7);
-          Cookies.set("user-token", data.user._id, {
+          Cookies.set('user-token', data.user._id, {
             expires: expiresAt,
           });
-          Cookies.set("isAuthenticated", data.user.isAuthenticated, {
+          Cookies.set('isAuthenticated', data.user.isAuthenticated, {
             expires: expiresAt,
           });
-          navigate("/authenticate");
+          navigate('/authenticate');
         })
         .catch((error) => {
           dispatch(
             setNotification({
-              message: "Oh no! Something went wrong. Please try again",
-              type: "error",
+              message: 'Oh no! Something went wrong. Please try again',
+              type: 'error',
             })
           );
-          console.error("Error:", error);
+          console.error('Error:', error);
         });
     });
   };
@@ -97,9 +102,9 @@ const Login: FunctionComponent = () => {
       LoginWithEmail(email, password, async (user) => {
         setIsLoading(true);
         await fetch(`${uri}/user`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             email: user.email,
@@ -111,31 +116,31 @@ const Login: FunctionComponent = () => {
             dispatch(setUser(data));
             dispatch(
               setNotification({
-                message: "Logged in Successfully",
-                type: "success",
+                message: 'Logged in Successfully',
+                type: 'success',
               })
             );
-            navigate("/home");
+            navigate('/home');
             console.log(data?.user);
-            Cookies.remove("user-token");
+            Cookies.remove('user-token');
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 1 * 7);
-            Cookies.set("user-token", data.user._id, {
+            Cookies.set('user-token', data.user._id, {
               expires: expiresAt,
             });
-            Cookies.remove("isAuthenticated");
-            Cookies.set("isAuthenticated", data.user.isAuthenticated, {
+            Cookies.remove('isAuthenticated');
+            Cookies.set('isAuthenticated', data.user.isAuthenticated, {
               expires: expiresAt,
             });
           })
           .catch((error) => {
             dispatch(
               setNotification({
-                message: "Oh no! Something went wrong. Please try again",
-                type: "error",
+                message: 'Oh no! Something went wrong. Please try again',
+                type: 'error',
               })
             );
-            console.error("Error:", error);
+            console.error('Error:', error);
           });
       });
     }
@@ -154,9 +159,9 @@ const Login: FunctionComponent = () => {
           isAuthenticated: false,
         };
         await fetch(`${uri}/register`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(userData),
         })
@@ -167,27 +172,27 @@ const Login: FunctionComponent = () => {
             dispatch(setUser(data.user));
             dispatch(
               setNotification({
-                message: "You have been Registered Successfully",
-                type: "success",
+                message: 'You have been Registered Successfully',
+                type: 'success',
               })
             );
-            navigate("/home");
-            Cookies.remove("user-token");
+            navigate('/home');
+            Cookies.remove('user-token');
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 1 * 7);
-            Cookies.set("user-token", data.user._id, {
+            Cookies.set('user-token', data.user._id, {
               expires: expiresAt,
             });
-            Cookies.set("isAuthenticated", data.user?.isAuthenticated, {
+            Cookies.set('isAuthenticated', data.user?.isAuthenticated, {
               expires: expiresAt,
             });
           })
           .catch((error) => {
-            console.error("Error:", error);
+            console.error('Error:', error);
             dispatch(
               setNotification({
-                message: "Oh no! Something went wrong. Please try again",
-                type: "error",
+                message: 'Oh no! Something went wrong. Please try again',
+                type: 'error',
               })
             );
           });
@@ -195,240 +200,292 @@ const Login: FunctionComponent = () => {
     }
   };
 
+  const buttonBaseStyles = {
+    py: 1.5,
+    px: 4,
+    fontSize: '1rem',
+    fontWeight: 600,
+    textTransform: 'none',
+    borderRadius: '10px',
+    boxShadow: 'none',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    transform: 'scale(1)',
+    position: 'relative',
+    overflow: 'hidden',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: 'rgba(255, 255, 255, 0.1)',
+      opacity: 0,
+      transition: 'opacity 0.3s ease',
+    },
+    '&:hover::after': {
+      opacity: 1,
+    },
+  };
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxWidth: '400px',
+    bgcolor: 'background.paper',
+    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.15)',
+    p: 4,
+    borderRadius: 3,
+    outline: 'none',
+  };
+
   return (
     <Container
+      maxWidth={false}
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #fff 0%, #FFF5E9 100%)',
+        position: 'relative',
+        py: 4,
       }}
     >
       {isLoading && <CustomLoader />}
+
+      <Title />
+
       <Box
         sx={{
-          my: 5,
+          width: '100%',
+          maxWidth: '400px',
+          p: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
         }}
       >
-        <Title />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          mx: "auto",
-          mb: 3,
-        }}
-      >
-        <Typography
+        <Box
           sx={{
-            fontFamily: "Raleway",
-            color: "white",
+            backgroundColor: '#ffffff',
+            p: 4,
+            borderRadius: '4px',
+            boxShadow: `
+              4px 4px 0 rgba(0, 0, 0, 0.1),
+              8px 8px 20px rgba(255, 132, 19, 0.15)
+            `,
+            border: '1px solid rgba(0, 0, 0, 0.08)',
           }}
         >
-          {!isLogin ? `Dont have a account?` : `Already have an account?`}
-          <Button
-            onClick={() => setIsLogin(!isLogin)}
-            sx={{
-              m: 0,
-              p: 0,
-            }}
+          <NeoPOPButton
+            onClick={() => setOpenModal(true)}
+            size='large'
+            sx={{ width: '100%', mb: 3 }}
           >
+            Continue with Email
+          </NeoPOPButton>
+
+          <Divider>
             <Typography
-              display="inline"
               sx={{
-                fontFamily: "Raleway",
-                textTransform: "none",
-                textDecoration: "underline",
-                color: "#07F0FF",
-                fontWeight: "bold",
+                color: 'rgba(0, 0, 0, 0.5)',
+                px: 2,
+                fontFamily: 'Raleway',
               }}
             >
-              {!isLogin ? `Register` : `Login`}
+              or
             </Typography>
-          </Button>
-        </Typography>
+          </Divider>
 
-        {isLogin && (
+          <NeoPOPButton
+            variant='secondary'
+            onClick={handleGoogleSignIn}
+            icon={
+              <Box
+                component='img'
+                src={GoogleIcon}
+                alt='Google'
+                sx={{ width: 20, height: 20 }}
+              />
+            }
+            size='large'
+            sx={{ width: '100%', mt: 3 }}
+          >
+            Continue with Google
+          </NeoPOPButton>
+        </Box>
+      </Box>
+
+      <Modal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        aria-labelledby='email-login-modal'
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: '440px',
+            bgcolor: '#ffffff',
+            borderRadius: '4px',
+            boxShadow: `
+              4px 4px 0 rgba(0, 0, 0, 0.1),
+              8px 8px 20px rgba(255, 132, 19, 0.15)
+            `,
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            p: 4,
+            outline: 'none',
+          }}
+        >
+          <Typography
+            variant='h5'
+            sx={{
+              fontFamily: 'Raleway',
+              fontWeight: 800,
+              color: '#1A1A1A',
+              mb: 3,
+              position: 'relative',
+              display: 'inline-block',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -4,
+                left: 0,
+                width: '40%',
+                height: '3px',
+                backgroundColor: theme.palette.primary.main,
+                borderRadius: '2px',
+              },
+            }}
+          >
+            {!isLogin ? 'Welcome Back' : 'Create Account'}
+          </Typography>
+
+          {isLogin && (
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}
+            >
+              <TextField
+                label='First Name'
+                onChange={(e) => setFirstName(e.target.value)}
+                error={Boolean(firstName) && firstName!.length <= 3}
+                helperText={
+                  firstName && firstName.length <= 3
+                    ? 'First Name is too short'
+                    : ''
+                }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '4px',
+                    transition: 'all 0.2s ease',
+                    '&.Mui-focused': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.primary.main,
+                        borderWidth: 2,
+                      },
+                      transform: 'translate(-2px, -2px)',
+                      boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.1)',
+                    },
+                  },
+                }}
+              />
+              <TextField
+                label='Last Name'
+                onChange={(e) => setLastName(e.target.value)}
+                error={Boolean(lastName) && lastName!.length <= 3}
+                helperText={
+                  lastName && lastName.length <= 3
+                    ? 'Last Name is too short'
+                    : ''
+                }
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '4px',
+                    transition: 'all 0.2s ease',
+                    '&.Mui-focused': {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.palette.primary.main,
+                        borderWidth: 2,
+                      },
+                      transform: 'translate(-2px, -2px)',
+                      boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.1)',
+                    },
+                  },
+                }}
+              />
+            </Box>
+          )}
+
+          <TextField
+            variant='outlined'
+            fullWidth
+            label='Email'
+            type='email'
+            onChange={(e) => setEmail(e.target.value)}
+            error={Boolean(email) && email!.length <= 3}
+            helperText={email && email.length <= 3 ? 'Email is invalid' : ''}
+            sx={{ mt: 2 }}
+          />
+
+          <OutlinedInput
+            fullWidth
+            type={showPassword ? 'text' : 'password'}
+            placeholder='Password'
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mt: 2 }}
+            endAdornment={
+              <InputAdornment position='end'>
+                <IconButton onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+
+          <NeoPOPButton
+            onClick={!isLogin ? handleLogin : handleSignIn}
+            size='large'
+            sx={{ width: '100%', mt: 3 }}
+          >
+            {!isLogin ? 'Login' : 'Register'}
+          </NeoPOPButton>
+
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
+              mt: 3,
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
             }}
           >
-            <TextField
-              variant="outlined"
-              size={"small"}
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.5)",
-                my: 1,
-                width: "260px",
-              }}
-              type="text"
-              error={`${firstName}`.length > 3 ? false : true}
-              helperText={
-                `${firstName}`.length > 3 ? "" : "First Name is too short"
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontFamily: "Raleway",
-                    color: "white",
-                  }}
-                >
-                  FirstName
-                </Typography>
-              }
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <TextField
-              variant="outlined"
-              size={"small"}
-              sx={{
-                backgroundColor: "rgba(255, 255, 255, 0.5)",
-                my: 1,
-                width: "260px",
-              }}
-              error={`${lastName}`.length > 3 ? false : true}
-              helperText={
-                `${lastName}`.length > 3 ? "" : "Last Name is too short"
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontFamily: "Raleway",
-                    color: "white",
-                  }}
-                >
-                  LastName
-                </Typography>
-              }
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </Box>
-        )}
-        <TextField
-          variant="outlined"
-          size={"small"}
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            my: 1,
-            width: "260px",
-          }}
-          type="email"
-          error={`${email}`.length > 3 ? false : true}
-          helperText={`${email}`.length > 3 ? "" : "Email is invalid"}
-          label={
             <Typography
               sx={{
-                fontFamily: "Raleway",
-                color: "white",
+                color: 'rgba(0, 0, 0, 0.6)',
+                fontFamily: 'Raleway',
               }}
             >
-              Email
+              {!isLogin ? `Don't have an account?` : 'Already have an account?'}
             </Typography>
-          }
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-        <OutlinedInput
-          size={"small"}
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            width: "260px",
-          }}
-          type={showPassword ? "text" : "password"}
-          label={"Password"}
-          onChange={(e) => setPassword(e.target.value)}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={() => setShowPassword(!showPassword)}
-                sx={{
-                  color: "white",
-                }}
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-        />
-        <Button
-          variant="contained"
-          disableElevation
-          sx={{
-            backgroundColor: "white",
-            my: 2,
-            mx: "auto",
-            width: 200,
-            borderRadius: "60px",
-            "&:hover": {
-              backgroundColor: "rgba(248, 248, 248, 0.8)",
-            },
-          }}
-          onClick={!isLogin ? handleLogin : handleSignIn}
-        >
-          <Typography
-            sx={{
-              color: "black",
-              textTransform: "none",
-              fontFamily: "Raleway",
-            }}
-          >
-            {!isLogin ? "Login" : "Register"}
-          </Typography>
-          <NavigateNextIcon
-            sx={{
-              color: "black",
-            }}
-          />
-        </Button>
-        <Typography
-          sx={{
-            color: "black",
-            textTransform: "none",
-            fontFamily: "Raleway",
-            mx: "auto",
-            my: 1,
-          }}
-        >
-          or
-        </Typography>
-        <Button
-          variant="contained"
-          disableElevation
-          sx={{
-            backgroundColor: "white",
-
-            mx: "auto",
-            width: 230,
-            borderRadius: "60px",
-            "&:hover": {
-              backgroundColor: "rgba(248, 248, 248, 0.8)",
-            },
-          }}
-          startIcon={<img src={GoogleIcon} alt="google-icon" width={24} />}
-          onClick={handleGoogleSignIn}
-        >
-          <Typography
-            sx={{
-              color: "black",
-              textTransform: "none",
-              fontFamily: "Raleway",
-              fontWeight: "bold",
-            }}
-          >
-            Login with Google
-          </Typography>
-          <NavigateNextIcon
-            sx={{
-              color: "black",
-            }}
-          />
-        </Button>
-      </Box>
+            <NeoPOPButton
+              variant='secondary'
+              onClick={() => setIsLogin(!isLogin)}
+              size='small'
+            >
+              {!isLogin ? 'Register' : 'Login'}
+            </NeoPOPButton>
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 };
