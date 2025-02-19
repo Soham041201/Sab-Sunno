@@ -18,6 +18,7 @@ import { setNotification } from '../redux/slice/notificationSlice';
 import { User } from '../types.defined';
 import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
+import NeoPOPTextField from '../components/common/NeoPOPTextField';
 
 const Profile = () => {
   const { userId } = useParams();
@@ -186,36 +187,14 @@ const Profile = () => {
               )}
             </Box>
 
-            <TextField
+            <NeoPOPTextField
               value={username}
-              variant='outlined'
               disabled={!isSelf}
-              sx={{
-                width: '100%',
-                maxWidth: '280px',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 0,
-                  transition: 'all 0.2s ease',
-                  backgroundColor: '#ffffff',
-                  borderColor: 'rgba(0, 0, 0, 0.12)',
-                  '&.Mui-focused': {
-                    transform: 'translate(-4px, -4px)',
-                    boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
-                    borderColor: theme.palette.primary.main,
-                  },
-                  '&:hover': {
-                    borderColor: 'rgba(0, 0, 0, 0.24)',
-                  },
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'Raleway',
-                  '&.Mui-focused': {
-                    color: theme.palette.primary.main,
-                  },
-                },
-              }}
               label='Username'
               onChange={(e) => setUsername(e.target.value)}
+              sx={{
+                maxWidth: '280px',
+              }}
             />
           </Box>
 
@@ -228,67 +207,25 @@ const Profile = () => {
                 mb: 4,
               }}
             >
-              <TextField
+              <NeoPOPTextField
                 value={fname}
-                variant='outlined'
                 disabled={!isSelf}
-                sx={{
-                  flex: 1,
-                  minWidth: '200px',
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 0,
-                    transition: 'all 0.2s ease',
-                    backgroundColor: '#ffffff',
-                    borderColor: 'rgba(0, 0, 0, 0.12)',
-                    '&.Mui-focused': {
-                      transform: 'translate(-4px, -4px)',
-                      boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
-                      borderColor: theme.palette.primary.main,
-                    },
-                    '&:hover': {
-                      borderColor: 'rgba(0, 0, 0, 0.24)',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    fontFamily: 'Raleway',
-                    '&.Mui-focused': {
-                      color: theme.palette.primary.main,
-                    },
-                  },
-                }}
                 label='First Name'
                 onChange={(e) => setFname(e.target.value)}
-              />
-              <TextField
-                value={lname}
-                variant='outlined'
-                disabled={!isSelf}
                 sx={{
                   flex: 1,
                   minWidth: '200px',
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 0,
-                    transition: 'all 0.2s ease',
-                    backgroundColor: '#ffffff',
-                    borderColor: 'rgba(0, 0, 0, 0.12)',
-                    '&.Mui-focused': {
-                      transform: 'translate(-4px, -4px)',
-                      boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
-                      borderColor: theme.palette.primary.main,
-                    },
-                    '&:hover': {
-                      borderColor: 'rgba(0, 0, 0, 0.24)',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    fontFamily: 'Raleway',
-                    '&.Mui-focused': {
-                      color: theme.palette.primary.main,
-                    },
-                  },
                 }}
+              />
+              <NeoPOPTextField
+                value={lname}
+                disabled={!isSelf}
                 label='Last Name'
                 onChange={(e) => setLname(e.target.value)}
+                sx={{
+                  flex: 1,
+                  minWidth: '200px',
+                }}
               />
             </Box>
 
@@ -390,35 +327,12 @@ const Profile = () => {
               About
             </Typography>
 
-            <TextField
+            <NeoPOPTextField
               value={about}
-              variant='outlined'
               disabled={!isSelf}
               multiline
               rows={4}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 0,
-                  transition: 'all 0.2s ease',
-                  backgroundColor: '#ffffff',
-                  borderColor: 'rgba(0, 0, 0, 0.12)',
-                  '&.Mui-focused': {
-                    transform: 'translate(-4px, -4px)',
-                    boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
-                    borderColor: theme.palette.primary.main,
-                  },
-                  '&:hover': {
-                    borderColor: 'rgba(0, 0, 0, 0.24)',
-                  },
-                },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'Raleway',
-                  '&.Mui-focused': {
-                    color: theme.palette.primary.main,
-                  },
-                },
-              }}
               placeholder='Tell us about yourself...'
               onChange={(e) => setAbout(e.target.value)}
             />

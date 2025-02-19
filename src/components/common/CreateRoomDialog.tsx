@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { FunctionComponent } from 'react';
 import NeoPOPButton from './NeoPOPButton';
+import NeoPOPTextField from './NeoPOPTextField';
 
 interface CreateRoomDialogProps {
   open: boolean;
@@ -121,79 +122,22 @@ const CreateRoomDialog: FunctionComponent<CreateRoomDialogProps> = ({
           </Typography>
         </DialogContentText>
 
-        <TextField
+        <NeoPOPTextField
           autoFocus
           margin='dense'
           label='Room Name'
-          placeholder='e.g., "Tech Innovators Hub" or "Creative Minds Unite"'
+          placeholder='Give your room a catchy name...'
           fullWidth
-          variant='outlined'
           onChange={(e) => onRoomNameChange(e.target.value)}
-          sx={{
-            mb: 2.5,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '4px',
-              transition: 'all 0.2s ease',
-              backgroundColor: '#ffffff',
-              '&:hover': {
-                backgroundColor: '#FEFEFE',
-              },
-              '&.Mui-focused': {
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
-                  borderWidth: 2,
-                },
-                transform: 'translate(-2px, -2px)',
-                boxShadow: `
-                  2px 2px 0 rgba(0, 0, 0, 0.04),
-                  4px 4px 12px rgba(255, 132, 19, 0.08)
-                `,
-              },
-            },
-            '& .MuiInputLabel-root': {
-              fontFamily: 'Raleway',
-              '&.Mui-focused': {
-                color: theme.palette.primary.main,
-              },
-            },
-          }}
         />
-        <TextField
+        <NeoPOPTextField
           margin='dense'
           label='Room Description'
           placeholder='Share what makes your room special and what kind of discussions to expect...'
           fullWidth
           multiline
           rows={3}
-          variant='outlined'
           onChange={(e) => onRoomDescriptionChange(e.target.value)}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '4px',
-              transition: 'all 0.2s ease',
-              backgroundColor: '#ffffff',
-              '&:hover': {
-                backgroundColor: '#FEFEFE',
-              },
-              '&.Mui-focused': {
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
-                  borderWidth: 2,
-                },
-                transform: 'translate(-2px, -2px)',
-                boxShadow: `
-                  2px 2px 0 rgba(0, 0, 0, 0.04),
-                  4px 4px 12px rgba(255, 132, 19, 0.08)
-                `,
-              },
-            },
-            '& .MuiInputLabel-root': {
-              fontFamily: 'Raleway',
-              '&.Mui-focused': {
-                color: theme.palette.primary.main,
-              },
-            },
-          }}
         />
       </DialogContent>
 

@@ -1,17 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
 import {
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
-  TextField,
   Typography,
   Box,
   useTheme,
+  InputAdornment,
 } from '@mui/material';
 import { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +16,8 @@ import { selectUser } from '../redux/slice/userSlice';
 import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
 import CreateRoomDialog from '../components/common/CreateRoomDialog';
+import NeoPOPTextField from '../components/common/NeoPOPTextField';
+import SearchIcon from '@mui/icons-material/Search';
 
 const Home: FunctionComponent = () => {
   const [isNewRoom, setIsNewRoom] = useState(false);
@@ -34,6 +30,8 @@ const Home: FunctionComponent = () => {
   const navigate = useNavigate();
 
   const [rooms, setRooms] = useState<any>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
   useEffect(() => {
     fetch(`${uri}/rooms`, {
       method: 'GET',
@@ -158,6 +156,24 @@ const Home: FunctionComponent = () => {
         onSubmit={createNewRoom}
         onRoomNameChange={setRoomName}
         onRoomDescriptionChange={setRoomDescription}
+      />
+
+      <NeoPOPTextField
+        placeholder='Search rooms...'
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position='start'>
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        sx={{
+          width: { xs: '100%', md: '400px' },
+          mb: 4,
+          mt: 2
+        }}
       />
 
       <Grid container spacing={3}>

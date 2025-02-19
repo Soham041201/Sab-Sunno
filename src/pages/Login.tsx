@@ -28,6 +28,7 @@ import { setNotification } from '../redux/slice/notificationSlice';
 import { setUser } from '../redux/slice/userSlice';
 import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
+import NeoPOPTextField from '../components/common/NeoPOPTextField';
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string | undefined>();
@@ -373,7 +374,7 @@ const Login: FunctionComponent = () => {
             <Box
               sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}
             >
-              <TextField
+              <NeoPOPTextField
                 label='First Name'
                 onChange={(e) => setFirstName(e.target.value)}
                 error={Boolean(firstName) && firstName!.length <= 3}
@@ -382,22 +383,8 @@ const Login: FunctionComponent = () => {
                     ? 'First Name is too short'
                     : ''
                 }
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '4px',
-                    transition: 'all 0.2s ease',
-                    '&.Mui-focused': {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.primary.main,
-                        borderWidth: 2,
-                      },
-                      transform: 'translate(-2px, -2px)',
-                      boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.1)',
-                    },
-                  },
-                }}
               />
-              <TextField
+              <NeoPOPTextField
                 label='Last Name'
                 onChange={(e) => setLastName(e.target.value)}
                 error={Boolean(lastName) && lastName!.length <= 3}
@@ -406,48 +393,35 @@ const Login: FunctionComponent = () => {
                     ? 'Last Name is too short'
                     : ''
                 }
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '4px',
-                    transition: 'all 0.2s ease',
-                    '&.Mui-focused': {
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.primary.main,
-                        borderWidth: 2,
-                      },
-                      transform: 'translate(-2px, -2px)',
-                      boxShadow: '2px 2px 0 rgba(0, 0, 0, 0.1)',
-                    },
-                  },
-                }}
               />
             </Box>
           )}
 
-          <TextField
-            variant='outlined'
-            fullWidth
+          <NeoPOPTextField
             label='Email'
             type='email'
             onChange={(e) => setEmail(e.target.value)}
-            error={Boolean(email) && email!.length <= 3}
-            helperText={email && email.length <= 3 ? 'Email is invalid' : ''}
-            sx={{ mt: 2 }}
+            error={Boolean(email) && !email?.includes('@')}
+            helperText={email && !email.includes('@') ? 'Invalid email' : ''}
           />
 
-          <OutlinedInput
-            fullWidth
+          <NeoPOPTextField
+            label='Password'
             type={showPassword ? 'text' : 'password'}
-            placeholder='Password'
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mt: 2 }}
-            endAdornment={
-              <InputAdornment position='end'>
-                <IconButton onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
+            error={Boolean(password) && password!.length <= 6}
+            helperText={
+              password && password.length <= 6 ? 'Password is too short' : ''
             }
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <IconButton onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <NeoPOPButton
