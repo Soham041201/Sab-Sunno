@@ -29,6 +29,7 @@ import NeoPOPTextField from '../components/common/NeoPOPTextField';
 import { InputAdornment } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import RoomChat from '../components/RoomChat';
+import AudioVisualizer from '../components/AudioVisualizer';
 
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
@@ -238,10 +239,7 @@ const Room: FunctionComponent = () => {
                       flexDirection: 'column',
                       alignItems: 'center',
                       cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                      },
+                      position: 'relative',
                     }}
                     onClick={() => navigate(`/profile/${client._id}`)}
                   >
@@ -251,35 +249,51 @@ const Room: FunctionComponent = () => {
                         provideRef(instance, client._id);
                       }}
                     />
-                    <Badge
-                      overlap='circular'
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                      }}
-                      badgeContent={
-                        <Avatar
-                          sx={{
-                            width: 24,
-                            height: 24,
-                            backgroundColor: 'transparent',
-                          }}
-                          src={muteIcon}
-                          variant='circular'
+                    <Box sx={{ position: 'relative' }}>
+                      {!client.isMuted && (
+                        <AudioVisualizer
+                          audioRef={
+                            provideRef(
+                              null,
+                              client._id
+                            ) as unknown as HTMLAudioElement
+                          }
+                          size={80}
+                          color={theme.palette.primary.main}
                         />
-                      }
-                      invisible={!client.isMuted}
-                    >
-                      <Avatar
-                        src={client?.photoURL}
-                        sx={{
-                          width: 64,
-                          height: 64,
-                          border: '2px solid #ffffff',
-                          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.12)',
+                      )}
+                      <Badge
+                        overlap='circular'
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'right',
                         }}
-                      />
-                    </Badge>
+                        badgeContent={
+                          <Avatar
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              backgroundColor: 'transparent',
+                            }}
+                            src={muteIcon}
+                            variant='circular'
+                          />
+                        }
+                        invisible={!client.isMuted}
+                      >
+                        <Avatar
+                          src={client?.photoURL}
+                          sx={{
+                            width: 64,
+                            height: 64,
+                            border: '2px solid #ffffff',
+                            boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.12)',
+                            position: 'relative',
+                            zIndex: 1,
+                          }}
+                        />
+                      </Badge>
+                    </Box>
 
                     <Typography
                       sx={{

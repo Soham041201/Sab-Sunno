@@ -70,6 +70,7 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
 
   return (
     <Box
+      onClick={handleRedirect}
       sx={{
         backgroundColor: '#ffffff',
         p: 3,
@@ -216,7 +217,6 @@ const RoomBox: FunctionComponent<RoomBoxProps> = ({
         </Box>
 
         <NeoPOPButton
-          onClick={handleRedirect}
           icon={<ArrowForwardIcon />}
           iconPosition='end'
           size='small'
