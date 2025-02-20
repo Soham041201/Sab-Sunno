@@ -11,17 +11,35 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import GroupIcon from '@mui/icons-material/Group';
-import { FunctionComponent, useState } from 'react';
+import {
+  FunctionComponent,
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+} from 'react';
 import NeoPOPTextField from './common/NeoPOPTextField';
+import { useSocketService } from '../services/webrtc/socket.service';
 
 interface RoomChatProps {
   isChatOpen: boolean;
-  messages: Array<{ text: string; timestamp: Date }>;
-  goofyMessages: Array<{ text: string; timestamp: Date; isBot?: boolean }>;
+  messages: Array<{
+    role: string;
+    text: string;
+    timestamp: Date;
+  }>;
+  goofyMessages: Array<{
+    text: string;
+    timestamp: Date;
+    isBot?: boolean;
+    role: string;
+  }>;
   message: string;
   onMessageChange: (message: string) => void;
   onSendMessage: (isGoofy?: boolean) => void;
   onToggleChat: () => void;
+  roomId: string;
+  isAITyping: boolean;
 }
 
 const RoomChat: FunctionComponent<RoomChatProps> = ({
@@ -32,57 +50,169 @@ const RoomChat: FunctionComponent<RoomChatProps> = ({
   onMessageChange,
   onSendMessage,
   onToggleChat,
+  roomId,
+  isAITyping,
 }) => {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  // Scroll when messages change or when AI is typing
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, goofyMessages, isAITyping, scrollToBottom]);
 
   const ChatMessage = ({
     text,
     timestamp,
     isBot,
+    role,
+    isAITyping,
   }: {
     text: string;
     timestamp: Date;
     isBot?: boolean;
+    role: string;
+    isAITyping: boolean;
   }) => (
     <Box
       sx={{
-        backgroundColor: '#ffffff',
-        p: 2,
-        borderRadius: '12px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-        maxWidth: '85%',
-        alignSelf: isBot ? 'flex-start' : 'flex-end',
+        backgroundColor:
+          role === 'assistant' ? 'rgba(240, 247, 255, 0.8)' : '#ffffff',
+        p: 1.5,
+        borderRadius:
+          role === 'assistant' ? '2px 10px 10px 10px' : '10px 2px 10px 10px',
+        boxShadow:
+          role === 'assistant'
+            ? '0 1px 4px rgba(0,0,0,0.06)'
+            : '0 1px 3px rgba(0,0,0,0.04)', 
+        maxWidth: '75%',
+        alignSelf: role === 'assistant' ? 'flex-start' : 'flex-end',
+        marginLeft: role === 'assistant' ? '8px' : 'auto',
+        marginRight: role === 'assistant' ? 'auto' : '8px',
+        marginBottom: '2px', // Reduced from 4px to 2px
         position: 'relative',
         '&:hover': {
           transform: 'translateY(-1px)',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          boxShadow:
+            role === 'assistant'
+              ? '0 2px 8px rgba(0,0,0,0.08)'
+              : '0 2px 6px rgba(0,0,0,0.06)',
         },
         transition: 'all 0.2s ease',
         border: `1px solid ${
-          isBot ? 'rgba(44, 62, 80, 0.1)' : theme.palette.primary.light
+          role === 'assistant'
+            ? 'rgba(66, 133, 244, 0.15)'
+            : 'rgba(0, 0, 0, 0.06)'
         }`,
+        '&::before':
+          role === 'assistant'
+            ? {
+                content: '""',
+                position: 'absolute',
+                left: -16,
+                top: 0,
+                width: 16,
+                height: 16,
+                backgroundImage: 'url(/bot-avatar.png)',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+              }
+            : {},
       }}
     >
       <Typography
         sx={{
-          fontSize: '0.9rem',
-          color: 'rgba(0, 0, 0, 0.8)',
+          fontSize: '0.85rem',
+          color:
+            role === 'assistant' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.75)',
           fontFamily: 'Raleway',
-          lineHeight: 1.5,
-          mb: 1,
+          lineHeight: 1.4,
+          mb: 0.1, // Reduced from 0.25 to 0.1
+          fontWeight: role === 'assistant' ? 500 : 400,
         }}
       >
         {text}
+        {role === 'assistant' && isAITyping && (
+          <Box
+            component='span'
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              ml: 0.5,
+            }}
+          >
+            <Box
+              component='span'
+              sx={{
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(66, 133, 244, 0.5)',
+                animation: 'typing 0.8s infinite',
+                '&:nth-of-type(2)': {
+                  animationDelay: '0.2s',
+                  mx: 0.3,
+                },
+                '&:nth-of-type(3)': {
+                  animationDelay: '0.4s',
+                },
+                '@keyframes typing': {
+                  '0%, 100%': {
+                    transform: 'translateY(0)',
+                  },
+                  '50%': {
+                    transform: 'translateY(-3px)',
+                  },
+                },
+              }}
+            />
+            <Box
+              component='span'
+              sx={{
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(66, 133, 244, 0.5)',
+                animation: 'typing 0.8s infinite',
+                mx: 0.3,
+                animationDelay: '0.2s',
+              }}
+            />
+            <Box
+              component='span'
+              sx={{
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(66, 133, 244, 0.5)',
+                animation: 'typing 0.8s infinite',
+                animationDelay: '0.4s',
+              }}
+            />
+          </Box>
+        )}
       </Typography>
       <Typography
         sx={{
-          fontSize: '0.7rem',
-          color: 'rgba(0, 0, 0, 0.4)',
+          fontSize: '0.65rem',
+          color:
+            role === 'assistant'
+              ? 'rgba(66, 133, 244, 0.5)'
+              : 'rgba(0, 0, 0, 0.35)',
           fontFamily: 'Raleway',
           textAlign: 'right',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: '3px',
         }}
       >
+        {role === 'assistant' && <SmartToyIcon sx={{ fontSize: 10 }} />}
         {timestamp.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
@@ -226,8 +356,11 @@ const RoomChat: FunctionComponent<RoomChatProps> = ({
                 text={msg.text}
                 timestamp={msg.timestamp}
                 isBot={activeTab === 1}
+                role={msg.role}
+                isAITyping={isAITyping}
               />
             ))}
+            <div ref={messagesEndRef} />
           </Box>
 
           <Box

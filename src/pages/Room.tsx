@@ -25,6 +25,7 @@ import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
 import RoomChat from '../components/RoomChat';
 import AudioVisualizer from '../components/AudioVisualizer';
+import { useSocketService } from '../services/webrtc/socket.service';
 
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
@@ -35,11 +36,17 @@ const Room: FunctionComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const { sendGeminiMessage, onGeminiResponse, onGeminiTyping, onGeminiError } =
+    useSocketService();
   const [message, setMessage] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [messages, setMessages] = useState<
-    Array<{ text: string; timestamp: Date }>
+    Array<{ text: string; timestamp: Date; role: string }>
   >([]);
+  const [goofyMessages, setGoofyMessages] = useState<
+    Array<{ text: string; timestamp: Date; role: string }>
+  >([]);
+  const [isAITyping, setIsAITyping] = useState(false);
 
   const copy = () => {
     const el = document.createElement('input');
@@ -77,9 +84,57 @@ const Room: FunctionComponent = () => {
     handleMute(user._id, isMuted);
   }, [isMuted, user._id, handleMute]);
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    const cleanupResponse = onGeminiResponse((response) => {
+      setGoofyMessages((prev) => [
+        ...prev,
+        {
+          text: response.message,
+          timestamp: new Date(response.timestamp),
+          role: 'assistant',
+        },
+      ]);
+      setIsAITyping(false);
+    });
+
+    const cleanupTyping = onGeminiTyping(({ isTyping }) => {
+      setIsAITyping(isTyping);
+    });
+
+    const cleanupError = onGeminiError(({ error }) => {
+      dispatch(
+        setNotification({
+          type: 'error',
+          message: error,
+        })
+      );
+    });
+
+    return () => {
+      cleanupResponse();
+      cleanupTyping();
+      cleanupError();
+    };
+  }, [onGeminiResponse, onGeminiTyping, onGeminiError, dispatch]);
+
+  const handleSendMessage = (isGoofy = false) => {
     if (message.trim()) {
-      setMessages([...messages, { text: message, timestamp: new Date() }]);
+      if (isGoofy) {
+        setGoofyMessages([
+          ...goofyMessages,
+          { text: message, timestamp: new Date(), role: 'user' },
+        ]);
+        setIsAITyping(true);
+        sendGeminiMessage({
+          message: message,
+          chatId: roomId || '',
+        });
+      } else {
+        setMessages([
+          ...messages,
+          { text: message, timestamp: new Date(), role: 'user' },
+        ]);
+      }
       setMessage('');
     }
   };
@@ -382,7 +437,9 @@ const Room: FunctionComponent = () => {
         onMessageChange={(newMessage) => setMessage(newMessage)}
         onSendMessage={handleSendMessage}
         onToggleChat={() => setIsChatOpen(!isChatOpen)}
-        goofyMessages={[]}
+        goofyMessages={goofyMessages}
+        roomId={roomId || ''}
+        isAITyping={isAITyping}
       />
     </Container>
   );
