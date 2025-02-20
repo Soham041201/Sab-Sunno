@@ -7,14 +7,13 @@ const Title = () => {
   const [loopNum, setLoopNum] = useState(0);
   const [typingSpeed, setTypingSpeed] = useState(150);
 
-  const phrases = [
-    'Where Every Voice Matters',
-    'Connect. Share. Grow.',
-    'Conversations That Count',
-    'Listen. Learn. Lead.',
-  ];
-
   useEffect(() => {
+    const phrases = [
+      'Where Every Voice Matters',
+      'Connect. Share. Grow.',
+      'Conversations That Count',
+      'Listen. Learn. Lead.',
+    ];
     const handleTyping = () => {
       const i = loopNum % phrases.length;
       const fullText = phrases[i];

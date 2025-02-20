@@ -1,6 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MicIcon from '@mui/icons-material/Mic';
-import MicOffIcon from '@mui/icons-material/MicOff';
+import MicIcon from '../images/mic-icon.svg';
+import MicOffIcon from '../images/mic-off-icon.svg';
 import ShareIcon from '@mui/icons-material/Share';
 import {
   Avatar,
@@ -74,8 +74,8 @@ const Room: FunctionComponent = () => {
   }, [roomId]);
 
   useEffect(() => {
-    handleMute(user._id, isMuted, roomId);
-  }, [isMuted, user._id, roomId, handleMute]);
+    handleMute(user._id, isMuted);
+  }, [isMuted, user._id, handleMute]);
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -240,9 +240,7 @@ const Room: FunctionComponent = () => {
                   >
                     <audio
                       autoPlay
-                      ref={(instance) => {
-                        provideRef(instance, client._id);
-                      }}
+                      ref={(instance) => provideRef(instance, client._id)}
                     />
                     <Box sx={{ position: 'relative' }}>
                       {!client.isMuted && (
@@ -358,33 +356,20 @@ const Room: FunctionComponent = () => {
                     ? theme.palette.error.dark
                     : '#FF7F50',
                   transform: 'translate(-2px, -2px)',
-                  boxShadow: `
-                    4px 4px 0 rgba(0, 0, 0, 0.2),
-                    6px 6px 0 ${
-                      isMuted
-                        ? 'rgba(211, 47, 47, 0.3)'
-                        : 'rgba(255, 127, 80, 0.3)'
-                    }
-                  `,
-                },
-                '&:active': {
-                  transform: 'translate(2px, 2px)',
-                  boxShadow: `
-                    1px 1px 0 rgba(0, 0, 0, 0.2),
-                    2px 2px 0 ${
-                      isMuted
-                        ? 'rgba(211, 47, 47, 0.3)'
-                        : 'rgba(255, 132, 19, 0.3)'
-                    }
-                  `,
                 },
               }}
             >
-              {!isMuted ? (
-                <MicIcon sx={{ fontSize: 28, color: '#ffffff' }} />
-              ) : (
-                <MicOffIcon sx={{ fontSize: 28, color: '#ffffff' }} />
-              )}
+              <Box
+                component='img'
+                src={!isMuted ? MicIcon : MicOffIcon}
+                sx={{
+                  width: 28,
+                  height: 28,
+                  filter: 'brightness(0) invert(1)',
+                  transition: 'transform 0.2s ease',
+                  transform: isMuted ? 'rotate(-6deg)' : 'none',
+                }}
+              />
             </IconButton>
           </Box>
         </Container>

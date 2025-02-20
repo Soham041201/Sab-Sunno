@@ -1,22 +1,20 @@
-export type User = {
+export interface User {
   _id: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  photoURL: string;
+  photoURL?: string;
   username: string;
-  isAuthenticated: boolean
-  about: string
-};
+  isAuthenticated: boolean;
+  about: string;
+}
 
-type RoomAdd = {
+export interface RoomUser extends User {
   isMuted: boolean;
-};
-
-export type RoomUser = User & RoomAdd;
+}
 
 export enum Theme {
-  light = "light",
-  dark = "dark",
+  light = 'light',
+  dark = 'dark',
 }
