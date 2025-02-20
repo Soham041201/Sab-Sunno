@@ -2,8 +2,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import ShareIcon from '@mui/icons-material/Share';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {
   Avatar,
   Badge,
@@ -25,9 +23,6 @@ import { selectUser } from '../redux/slice/userSlice';
 import { RoomUser } from '../types.defined';
 import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
-import NeoPOPTextField from '../components/common/NeoPOPTextField';
-import { InputAdornment } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
 import RoomChat from '../components/RoomChat';
 import AudioVisualizer from '../components/AudioVisualizer';
 

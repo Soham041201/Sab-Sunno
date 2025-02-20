@@ -2,7 +2,6 @@ import {
   Avatar,
   AvatarGroup,
   Box,
-  Button,
   IconButton,
   Tooltip,
   Typography,

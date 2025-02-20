@@ -1,14 +1,5 @@
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Divider,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Avatar, Box, Container, Typography, useTheme } from '@mui/material';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';

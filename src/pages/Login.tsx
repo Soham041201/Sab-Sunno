@@ -1,16 +1,11 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
   Box,
-  Button,
   Container,
   Divider,
   IconButton,
   InputAdornment,
-  InputLabel,
   Modal,
-  OutlinedInput,
-  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -199,48 +194,6 @@ const Login: FunctionComponent = () => {
           });
       });
     }
-  };
-
-  const buttonBaseStyles = {
-    py: 1.5,
-    px: 4,
-    fontSize: '1rem',
-    fontWeight: 600,
-    textTransform: 'none',
-    borderRadius: '10px',
-    boxShadow: 'none',
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-    transform: 'scale(1)',
-    position: 'relative',
-    overflow: 'hidden',
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: 'rgba(255, 255, 255, 0.1)',
-      opacity: 0,
-      transition: 'opacity 0.3s ease',
-    },
-    '&:hover::after': {
-      opacity: 1,
-    },
-  };
-
-  const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '90%',
-    maxWidth: '400px',
-    bgcolor: 'background.paper',
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.15)',
-    p: 4,
-    borderRadius: 3,
-    outline: 'none',
   };
 
   return (
