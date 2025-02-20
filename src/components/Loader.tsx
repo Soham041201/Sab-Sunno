@@ -1,23 +1,45 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, useTheme } from '@mui/material';
+import { FunctionComponent } from 'react';
 
-const CustomLoader = ()=>{
-return(
-    <Box
-        sx={{
-          position: "absolute",
-          textAlign: "center",
-          margin: "auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: 'full',
-          height: "screen",
-          zIndex: 1,
-        }}
-      >
-        <CircularProgress disableShrink />
-      </Box>
-)
+interface LoaderProps {
+  size?: number;
+  color?: string;
+  fullScreen?: boolean;
 }
+
+const CustomLoader: FunctionComponent<LoaderProps> = ({
+  size = 40,
+  color,
+  fullScreen = false,
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Box
+      sx={{
+        position: fullScreen ? 'fixed' : 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: fullScreen
+          ? 'rgba(255, 255, 255, 0.8)'
+          : 'transparent',
+        zIndex: theme.zIndex.modal,
+      }}
+    >
+      <CircularProgress
+        size={size}
+        sx={{
+          color: color || theme.palette.primary.main,
+        }}
+        disableShrink
+      />
+    </Box>
+  );
+};
 
 export default CustomLoader;

@@ -1,15 +1,25 @@
-import Cookies from "js-cookie";
-import { Navigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+import { Navigate } from 'react-router-dom';
+import { ReactElement, Suspense } from 'react';
+import CustomLoader from './Loader';
 
-const HomeRoute = ({ children }: { children: JSX.Element }) => {
-  const token = Cookies.get("user-token");
-  const isAuthenticated = Cookies.get("isAuthenticated");
+interface HomeRouteProps {
+  children: ReactElement;
+}
 
-  console.log(token && isAuthenticated);
-  if (token && isAuthenticated === "false") {
-    return children;
+const HomeRoute = ({ children }: HomeRouteProps) => {
+  const token = Cookies.get('user-token');
+  const isAuthenticated = Cookies.get('isAuthenticated');
+
+  if (!token) {
+    return <Navigate to='/login' replace />;
   }
-  return <Navigate to="/home" replace />;
+
+  if (isAuthenticated === 'false') {
+    return <Suspense fallback={<CustomLoader />}>{children}</Suspense>;
+  }
+
+  return <Navigate to='/home' replace />;
 };
 
 export default HomeRoute;
