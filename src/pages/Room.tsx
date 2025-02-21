@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWebRTC } from '../hooks/useWebRTC';
@@ -28,13 +28,14 @@ import AudioVisualizer from '../components/AudioVisualizer';
 import { useSocketService } from '../services/webrtc/socket.service';
 import { usePipecatRTVI } from '../hooks/usePipecatRTVI';
 import { copy } from '../utils/misc';
+import { useRoomAudio } from '../hooks/audio/useRoomAudio';
 
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
   const user = useSelector(selectUser);
   const [room, setRoom] = useState<any>({});
   const { clients, provideRef, handleMute } = useWebRTC(roomId, user);
-  const { botAudioStream, sendAudioToBot } = usePipecatRTVI(roomId || '');
+  const { botAudioStream } = usePipecatRTVI(roomId || '');
   const { sendGeminiMessage, onGeminiResponse, onGeminiTyping, onGeminiError } =
     useSocketService();
   const [isMuted, setIsMuted] = useState<boolean>(true);
@@ -51,6 +52,37 @@ const Room: FunctionComponent = () => {
     Array<{ text: string; timestamp: Date; role: string }>
   >([]);
   const [isAITyping, setIsAITyping] = useState(false);
+  const [isBotAudioActive, setIsBotAudioActive] = useState(false);
+
+  // Initialize room audio
+  const { state: audioState, controls: audioControls } = useRoomAudio({
+    roomId,
+    user,
+    clients,
+    botAudioStream,
+    provideRef,
+    onError: (error) => {
+      dispatch(
+        setNotification({
+          type: 'error',
+          message: `Audio Error: ${error.message}`,
+        })
+      );
+    },
+  });
+
+  // Handle mute state changes
+  useEffect(() => {
+    audioControls.setMuted(isMuted);
+    handleMute(user._id, isMuted);
+  }, [isMuted, user._id, audioControls, handleMute]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      audioControls.cleanup().catch(console.error);
+    };
+  }, [audioControls]);
 
   useEffect(() => {
     fetch(`${uri}/room/${roomId}`, {
@@ -69,10 +101,6 @@ const Room: FunctionComponent = () => {
         console.error('Error:', error);
       });
   }, [roomId]);
-
-  useEffect(() => {
-    handleMute(user._id, isMuted);
-  }, [isMuted, user._id, handleMute]);
 
   useEffect(() => {
     const cleanupResponse = onGeminiResponse((response) => {
@@ -107,93 +135,29 @@ const Room: FunctionComponent = () => {
     };
   }, [onGeminiResponse, onGeminiTyping, onGeminiError, dispatch]);
 
-  // Create an audio mixer to combine streams
   useEffect(() => {
-    if (!botAudioStream || !botAudioStream.getAudioTracks().length) return;
+    if (botAudioStream) {
+      setIsBotAudioActive(true);
 
-    let audioContext: AudioContext | null = null;
-    try {
-      audioContext = new AudioContext();
-      const mixedDestination = audioContext.createMediaStreamDestination();
+      console.log('Bot Audio Tracks:', botAudioStream.getAudioTracks());
 
-      // Add bot's audio to the mix with error handling
-      try {
-        const botSource = audioContext.createMediaStreamSource(botAudioStream);
-        const botGain = audioContext.createGain();
-        botGain.gain.value = 1.0; // Increased bot volume
-        botSource.connect(botGain);
-        botGain.connect(mixedDestination);
-
-        // Create and play bot audio element
-        const botAudio = new Audio();
-        botAudio.srcObject = botAudioStream;
-        botAudio.autoplay = true;
-        botAudio
-          .play()
-          .catch((err) => console.error('Error playing bot audio:', err));
-      } catch (err) {
-        console.error('Error adding bot audio:', err);
+      const track = botAudioStream.getAudioTracks()[0];
+      if (track) {
+        track.onended = () => {
+          console.log('Bot audio track ended');
+          setIsBotAudioActive(false);
+        };
+        track.onmute = () => {
+          console.log('Bot audio track muted');
+        };
+        track.onunmute = () => {
+          console.log('Bot audio track unmuted');
+        };
       }
-
-      // Add each client's audio to the mix
-      clients.forEach((client: RoomUser) => {
-        try {
-          const audioElement = provideRef(
-            null,
-            client._id
-          ) as unknown as HTMLAudioElement;
-          if (
-            audioElement?.srcObject &&
-            (audioElement.srcObject as MediaStream).getAudioTracks().length > 0
-          ) {
-            const clientSource = audioContext!.createMediaStreamSource(
-              audioElement.srcObject as MediaStream
-            );
-            const clientGain = audioContext!.createGain();
-            clientGain.gain.value = 0.5; // Client volume
-            clientSource.connect(clientGain);
-            clientGain.connect(mixedDestination);
-          }
-        } catch (err) {
-          console.error(`Error adding client ${client._id} audio:`, err);
-        }
-      });
-
-      // Use the mixed stream
-      const mixedAudio = new Audio();
-      mixedAudio.srcObject = mixedDestination.stream;
-      mixedAudio.autoplay = true;
-      mixedAudio
-        .play()
-        .catch((err) => console.error('Error playing mixed audio:', err));
-
-      return () => {
-        try {
-          audioContext?.close();
-        } catch (err) {
-          console.error('Error closing audio context:', err);
-        }
-      };
-    } catch (err) {
-      console.error('Error setting up audio mixing:', err);
+    } else {
+      setIsBotAudioActive(false);
     }
-  }, [botAudioStream, clients]);
-
-  // Send local audio to both WebRTC peers and the bot
-  useEffect(() => {
-    if (!user._id || isMuted) return;
-
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        // Send to WebRTC peers
-        handleMute(user._id, false);
-
-        // Send to bot
-        sendAudioToBot(stream);
-      })
-      .catch((err) => console.error('Error accessing microphone:', err));
-  }, [isMuted, user._id]);
+  }, [botAudioStream]);
 
   const handleSendMessage = (isGoofy = false) => {
     if (message.trim()) {
@@ -216,6 +180,10 @@ const Room: FunctionComponent = () => {
       setMessage('');
     }
   };
+
+  const handleMuteToggle = useCallback(() => {
+    setIsMuted(!isMuted);
+  }, [isMuted]);
 
   return (
     <Container
@@ -471,7 +439,8 @@ const Room: FunctionComponent = () => {
             }}
           >
             <IconButton
-              onClick={() => setIsMuted(!isMuted)}
+              onClick={handleMuteToggle}
+              disabled={audioState.error !== null}
               sx={{
                 p: 2,
                 backgroundColor: isMuted
@@ -509,6 +478,30 @@ const Room: FunctionComponent = () => {
               />
             </IconButton>
           </Box>
+
+          {audioState.error && (
+            <Typography
+              sx={{
+                color: theme.palette.error.main,
+                mt: 2,
+                fontSize: '0.875rem',
+              }}
+            >
+              Audio Error: {audioState.error.message}
+            </Typography>
+          )}
+
+          {isBotAudioActive && (
+            <Typography
+              sx={{
+                color: theme.palette.success.main,
+                mt: 1,
+                fontSize: '0.875rem',
+              }}
+            >
+              Bot Audio Connected
+            </Typography>
+          )}
         </Container>
       </Box>
 
