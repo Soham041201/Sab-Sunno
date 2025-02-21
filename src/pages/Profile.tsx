@@ -2,7 +2,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { Avatar, Box, Container, Typography, useTheme } from '@mui/material';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import UploadImage from '../functions/dataBase/uploadImage';
 import { setNotification } from '../redux/slice/notificationSlice';
@@ -10,26 +10,24 @@ import { User } from '../types.defined';
 import { uri } from '../config/config';
 import NeoPOPButton from '../components/common/NeoPOPButton';
 import NeoPOPTextField from '../components/common/NeoPOPTextField';
+import { selectUser } from '../redux/slice/userSlice';
 
 const Profile = () => {
   const { userId } = useParams();
   const userToken = Cookies.get('user-token');
   const [user, setUser] = useState<User>();
   const isMobile = window.innerWidth < 600;
-  const [url, setUrl] = useState<string | undefined>('');
-  const [fname, setFname] = useState<string | undefined>('');
-  const [lname, setLname] = useState<string | undefined>('');
-  const [username, setUsername] = useState<string | undefined>('');
-  const [about, setAbout] = useState<string | undefined>('');
   const isSelf = userId === userToken;
-
+  const currentUser = useSelector(selectUser);
   console.log(isSelf);
-
+  console.log(currentUser);
   const dispatch = useDispatch();
   const theme = useTheme();
 
   useEffect(() => {
-    if (userId) {
+    if (isSelf) {
+      setUser(currentUser);
+    } else if (userId) {
       fetch(`${uri}/user/${userId}`, {
         method: 'GET',
         headers: {
@@ -40,11 +38,6 @@ const Profile = () => {
         .then((data) => {
           if (data) {
             setUser(data?.user);
-            setUrl(data?.user?.photoURL);
-            setFname(data?.user?.firstName);
-            setLname(data?.user?.lastName);
-            setUsername(data?.user?.username);
-            setAbout(data?.user?.about);
           }
         })
         .catch((error) => {
@@ -52,17 +45,17 @@ const Profile = () => {
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser]);
 
   const handleUpdate = async () => {
     await fetch(`${uri}/user/update/${user?._id}`, {
       method: 'PUT',
       body: JSON.stringify({
-        username: username,
-        photoURL: url,
-        firstName: fname,
-        lastName: lname,
-        about: about,
+        username: user?.username,
+        photoURL: user?.photoURL,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        about: user?.about,
         password: user?.password,
       }),
       headers: {
@@ -136,7 +129,7 @@ const Profile = () => {
                   borderColor: 'rgba(255, 132, 19, 0.2)',
                   boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
                 }}
-                src={url || user.photoURL}
+                src={user.photoURL}
               />
               {isSelf && (
                 <Box
@@ -169,7 +162,7 @@ const Profile = () => {
                     hidden
                     onChange={async (e) =>
                       await UploadImage(e, (url) => {
-                        setUrl(url);
+                        setUser({ ...user, photoURL: url });
                       })
                     }
                     disabled={!isSelf}
@@ -179,10 +172,10 @@ const Profile = () => {
             </Box>
 
             <NeoPOPTextField
-              value={username}
+              value={user.username}
               disabled={!isSelf}
               label='Username'
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUser({ ...user, username: e.target.value })}
               sx={{
                 maxWidth: '280px',
               }}
@@ -199,20 +192,20 @@ const Profile = () => {
               }}
             >
               <NeoPOPTextField
-                value={fname}
+                value={user.firstName}
                 disabled={!isSelf}
                 label='First Name'
-                onChange={(e) => setFname(e.target.value)}
+                onChange={(e) => setUser({ ...user, firstName: e.target.value })}
                 sx={{
                   flex: 1,
                   minWidth: '200px',
                 }}
               />
               <NeoPOPTextField
-                value={lname}
+                value={user.lastName}
                 disabled={!isSelf}
                 label='Last Name'
-                onChange={(e) => setLname(e.target.value)}
+                onChange={(e) => setUser({ ...user, lastName: e.target.value })}
                 sx={{
                   flex: 1,
                   minWidth: '200px',
@@ -231,80 +224,7 @@ const Profile = () => {
               {user.email}
             </Typography>
 
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 4,
-                mb: 4,
-              }}
-            >
-              <Box
-                sx={{
-                  flex: 1,
-                  minWidth: '200px',
-                  p: 3,
-                  backgroundColor: 'rgba(255, 132, 19, 0.04)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 132, 19, 0.1)',
-                }}
-              >
-                <Typography
-                  variant='h6'
-                  sx={{
-                    fontFamily: 'Raleway',
-                    fontWeight: 600,
-                    color: '#2C3E50',
-                    mb: 1,
-                  }}
-                >
-                  Followers
-                </Typography>
-                <Typography
-                  variant='h4'
-                  sx={{
-                    fontFamily: 'Raleway',
-                    fontWeight: 800,
-                    color: theme.palette.primary.main,
-                  }}
-                >
-                  0
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  flex: 1,
-                  minWidth: '200px',
-                  p: 3,
-                  backgroundColor: 'rgba(255, 132, 19, 0.04)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 132, 19, 0.1)',
-                }}
-              >
-                <Typography
-                  variant='h6'
-                  sx={{
-                    fontFamily: 'Raleway',
-                    fontWeight: 600,
-                    color: '#2C3E50',
-                    mb: 1,
-                  }}
-                >
-                  Following
-                </Typography>
-                <Typography
-                  variant='h4'
-                  sx={{
-                    fontFamily: 'Raleway',
-                    fontWeight: 800,
-                    color: theme.palette.primary.main,
-                  }}
-                >
-                  0
-                </Typography>
-              </Box>
-            </Box>
+  
 
             <Typography
               variant='h6'
@@ -319,13 +239,13 @@ const Profile = () => {
             </Typography>
 
             <NeoPOPTextField
-              value={about}
+              value={user.about}
               disabled={!isSelf}
               multiline
               rows={4}
               fullWidth
               placeholder='Tell us about yourself...'
-              onChange={(e) => setAbout(e.target.value)}
+              onChange={(e) => setUser({ ...user, about: e.target.value })}
             />
           </Box>
         </Box>
