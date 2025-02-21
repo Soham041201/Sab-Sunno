@@ -19,7 +19,6 @@ import {
   useEffect,
 } from 'react';
 import NeoPOPTextField from './common/NeoPOPTextField';
-import { useSocketService } from '../services/webrtc/socket.service';
 
 interface RoomChatProps {
   isChatOpen: boolean;
@@ -89,7 +88,7 @@ const RoomChat: FunctionComponent<RoomChatProps> = ({
         boxShadow:
           role === 'assistant'
             ? '0 1px 4px rgba(0,0,0,0.06)'
-            : '0 1px 3px rgba(0,0,0,0.04)', 
+            : '0 1px 3px rgba(0,0,0,0.04)',
         maxWidth: '75%',
         alignSelf: role === 'assistant' ? 'flex-start' : 'flex-end',
         marginLeft: role === 'assistant' ? '8px' : 'auto',
@@ -129,7 +128,9 @@ const RoomChat: FunctionComponent<RoomChatProps> = ({
         sx={{
           fontSize: '0.85rem',
           color:
-            role === 'assistant' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.75)',
+            role === 'assistant'
+              ? 'rgba(0, 0, 0, 0.85)'
+              : 'rgba(0, 0, 0, 0.75)',
           fontFamily: 'Raleway',
           lineHeight: 1.4,
           mb: 0.1, // Reduced from 0.25 to 0.1

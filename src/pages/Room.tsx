@@ -27,6 +27,7 @@ import RoomChat from '../components/RoomChat';
 import AudioVisualizer from '../components/AudioVisualizer';
 import { useSocketService } from '../services/webrtc/socket.service';
 import { usePipecatRTVI } from '../hooks/usePipecatRTVI';
+import { copy } from '../utils/misc';
 
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
@@ -34,12 +35,13 @@ const Room: FunctionComponent = () => {
   const [room, setRoom] = useState<any>({});
   const { clients, provideRef, handleMute } = useWebRTC(roomId, user);
   const { botAudioStream, sendAudioToBot } = usePipecatRTVI(roomId || '');
+  const { sendGeminiMessage, onGeminiResponse, onGeminiTyping, onGeminiError } =
+    useSocketService();
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { sendGeminiMessage, onGeminiResponse, onGeminiTyping, onGeminiError } =
-    useSocketService();
+
   const [message, setMessage] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [messages, setMessages] = useState<
@@ -49,20 +51,6 @@ const Room: FunctionComponent = () => {
     Array<{ text: string; timestamp: Date; role: string }>
   >([]);
   const [isAITyping, setIsAITyping] = useState(false);
-
-  const copy = () => {
-    const el = document.createElement('input');
-    el.value =
-      'Join me and my friends having a amazing conversation at ' +
-      window.location.href;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    dispatch(
-      setNotification({ type: 'success', message: 'Link copied to clipboard' })
-    );
-  };
 
   useEffect(() => {
     fetch(`${uri}/room/${roomId}`, {
@@ -257,7 +245,11 @@ const Room: FunctionComponent = () => {
             Back to Rooms
           </NeoPOPButton>
 
-          <NeoPOPButton icon={<ShareIcon />} onClick={copy} size='small'>
+          <NeoPOPButton
+            icon={<ShareIcon />}
+            onClick={() => copy(dispatch)}
+            size='small'
+          >
             Invite Friends
           </NeoPOPButton>
         </Box>

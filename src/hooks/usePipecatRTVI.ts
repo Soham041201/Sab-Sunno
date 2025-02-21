@@ -1,4 +1,4 @@
-import { RTVIClient, RTVIEvent, Transport } from '@pipecat-ai/client-js';
+import { RTVIClient, RTVIEvent } from '@pipecat-ai/client-js';
 import { DailyTransport } from '@pipecat-ai/daily-transport';
 import { useEffect, useRef, useState } from 'react';
 
@@ -6,9 +6,6 @@ export const usePipecatRTVI = (roomId: string) => {
   const rtviClientRef = useRef<RTVIClient | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [botAudioStream, setBotAudioStream] = useState<MediaStream | null>(
-    null
-  );
-  const [userAudioStream, setUserAudioStream] = useState<MediaStream | null>(
     null
   );
 
@@ -104,12 +101,11 @@ export const usePipecatRTVI = (roomId: string) => {
       'Processed audio stream tracks:',
       processedStream.getAudioTracks().length
     );
-    setUserAudioStream(processedStream);
 
     // Try to send the audio track to the transport
     try {
-      const transport = rtviClientRef.current.transport as DailyTransport;
-      transport.setAudioTrack(processedStream.getAudioTracks()[0]);
+      //   const transport = rtviClientRef.current.transport as DailyTransport;
+      //   transport.setAudioTrack(processedStream.getAudioTracks()[0]);
       console.log('Audio track sent to transport');
     } catch (err) {
       console.error('Error sending audio to transport:', err);
