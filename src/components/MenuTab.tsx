@@ -241,7 +241,7 @@ const MenuTab: FunctionComponent<MenuTabProps> = ({ user }) => {
             <Typography>Profile</Typography>
           </MenuItem>
 
-          <MenuItem>
+          <MenuItem onClick={() => navigate('/settings')}>
             <ListItemIcon>
               <Box
                 sx={{

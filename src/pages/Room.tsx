@@ -26,12 +26,14 @@ import NeoPOPButton from '../components/common/NeoPOPButton';
 import RoomChat from '../components/RoomChat';
 import AudioVisualizer from '../components/AudioVisualizer';
 import { useSocketService } from '../services/webrtc/socket.service';
+import { usePipecatRTVI } from '../hooks/usePipecatRTVI';
 
 const Room: FunctionComponent = () => {
   const { roomId } = useParams();
   const user = useSelector(selectUser);
   const [room, setRoom] = useState<any>({});
   const { clients, provideRef, handleMute } = useWebRTC(roomId, user);
+  const { botAudioStream, sendAudioToBot } = usePipecatRTVI(roomId || '');
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -116,6 +118,94 @@ const Room: FunctionComponent = () => {
       cleanupError();
     };
   }, [onGeminiResponse, onGeminiTyping, onGeminiError, dispatch]);
+
+  // Create an audio mixer to combine streams
+  useEffect(() => {
+    if (!botAudioStream || !botAudioStream.getAudioTracks().length) return;
+
+    let audioContext: AudioContext | null = null;
+    try {
+      audioContext = new AudioContext();
+      const mixedDestination = audioContext.createMediaStreamDestination();
+
+      // Add bot's audio to the mix with error handling
+      try {
+        const botSource = audioContext.createMediaStreamSource(botAudioStream);
+        const botGain = audioContext.createGain();
+        botGain.gain.value = 1.0; // Increased bot volume
+        botSource.connect(botGain);
+        botGain.connect(mixedDestination);
+
+        // Create and play bot audio element
+        const botAudio = new Audio();
+        botAudio.srcObject = botAudioStream;
+        botAudio.autoplay = true;
+        botAudio
+          .play()
+          .catch((err) => console.error('Error playing bot audio:', err));
+      } catch (err) {
+        console.error('Error adding bot audio:', err);
+      }
+
+      // Add each client's audio to the mix
+      clients.forEach((client: RoomUser) => {
+        try {
+          const audioElement = provideRef(
+            null,
+            client._id
+          ) as unknown as HTMLAudioElement;
+          if (
+            audioElement?.srcObject &&
+            (audioElement.srcObject as MediaStream).getAudioTracks().length > 0
+          ) {
+            const clientSource = audioContext!.createMediaStreamSource(
+              audioElement.srcObject as MediaStream
+            );
+            const clientGain = audioContext!.createGain();
+            clientGain.gain.value = 0.5; // Client volume
+            clientSource.connect(clientGain);
+            clientGain.connect(mixedDestination);
+          }
+        } catch (err) {
+          console.error(`Error adding client ${client._id} audio:`, err);
+        }
+      });
+
+      // Use the mixed stream
+      const mixedAudio = new Audio();
+      mixedAudio.srcObject = mixedDestination.stream;
+      mixedAudio.autoplay = true;
+      mixedAudio
+        .play()
+        .catch((err) => console.error('Error playing mixed audio:', err));
+
+      return () => {
+        try {
+          audioContext?.close();
+        } catch (err) {
+          console.error('Error closing audio context:', err);
+        }
+      };
+    } catch (err) {
+      console.error('Error setting up audio mixing:', err);
+    }
+  }, [botAudioStream, clients]);
+
+  // Send local audio to both WebRTC peers and the bot
+  useEffect(() => {
+    if (!user._id || isMuted) return;
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        // Send to WebRTC peers
+        handleMute(user._id, false);
+
+        // Send to bot
+        sendAudioToBot(stream);
+      })
+      .catch((err) => console.error('Error accessing microphone:', err));
+  }, [isMuted, user._id]);
 
   const handleSendMessage = (isGoofy = false) => {
     if (message.trim()) {

@@ -19,6 +19,7 @@ import NotFound from './NotFound';
 import Profile from './Profile';
 import Room from './Room';
 import { uri } from '../config/config';
+import Settings from './Settings';
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.theme);
@@ -96,7 +97,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path='/settings'
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>
